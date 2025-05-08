@@ -13,6 +13,7 @@ CREATE TABLE [user] (
     lastName VARCHAR(40) NOT NULL,
     email VARCHAR(255) NOT NULL,
     phoneNumber VARCHAR(10) NOT NULL,
+    password VARBINARY(256) NOT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('guest', 'student', 'president', 'advisor', 'admin')),
     PRIMARY KEY(userID)
 );
