@@ -1,1 +1,23 @@
+networks:
+  kittycatsuperfun:
+    external: false
+
 services:
+  # database for user/club data
+  SEN300UserClubServiceDBSqlServer:
+    container_name: SEN300UserClubServiceDBSqlServer
+    image: mcr.microsoft.com/mssql/server:2019-latest    
+    restart: always
+    hostname: SEN300UserClubServiceDBSqlServer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlservervolume:/var/opt/mssql
+    networks:
+      - kittycatsuperfun
+    environment:
+      SA_PASSWORD: "abc12345!"
+      ACCEPT_EULA: "Y"
+
+volumes:
+  sqlservervolume:
