@@ -25,7 +25,6 @@ CREATE TABLE `userclub`(
     `userID` INT NOT NULL,
     `clubID` INT NOT NULL
 	);
-    
 ALTER TABLE `club` 
 ADD CONSTRAINT `presidentIDuserID`
 FOREIGN KEY (`presidentID`)
