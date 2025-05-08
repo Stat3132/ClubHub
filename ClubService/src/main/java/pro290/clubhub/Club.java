@@ -1,4 +1,4 @@
-package ClubService;
+package pro290.clubhub;
 
 public class Club {
     String clubName;
