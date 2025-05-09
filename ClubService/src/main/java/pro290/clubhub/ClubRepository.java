@@ -3,9 +3,9 @@ package pro290.clubhub;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface FoodRepository extends MongoRepository<Club, UUID> { // second param used to be long when Id was long,
+public interface ClubRepository extends JpaRepository<Club, UUID> { // second param used to be long when Id was long,
                                                                       // see Food class
 
     //public List<Food> findByTitleContainingOrDescriptionContaining(String txt, String txt2);
