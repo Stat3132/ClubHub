@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface FoodRepository extends MongoRepository<Food, UUID> { // second param used to be long when Id was long,
+public interface FoodRepository extends MongoRepository<Club, UUID> { // second param used to be long when Id was long,
                                                                       // see Food class
 
     //public List<Food> findByTitleContainingOrDescriptionContaining(String txt, String txt2);
@@ -13,5 +13,5 @@ public interface FoodRepository extends MongoRepository<Food, UUID> { // second 
     //List<Food> findByTitleContainingIgnoreCase(String title);
 
     //Custom query to find foods in foodItem
-    List<Food> findByFoodNameContainingIgnoreCase(String foodName);
+    List<Club> findByFoodNameContainingIgnoreCase(String foodName);
 }

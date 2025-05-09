@@ -1,6 +1,7 @@
 package pro290.clubhub;
 
 public class Club {
+    int clubID;
     String clubName;
     String clubDecleration;
     String clubPresidentName;
