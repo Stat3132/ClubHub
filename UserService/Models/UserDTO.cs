@@ -1,10 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 
-public class UserDTO
+namespace UserService.Models
 {
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Email { get; set; }
-    public string PhoneNumber { get; set; }
-    public Role UsersRole { get; set; }
+    public class UserDTO
+    {
+        public required Guid userID { get; set; }
+        public required string firstName { get; set; }
+        public required string lastName { get; set; }
+        public required string email { get; set; }
+        public required string phoneNumber { get; set; }
+        public required Role role { get; set; }
+    }
 }

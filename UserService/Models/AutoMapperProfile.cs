@@ -1,11 +1,11 @@
 using AutoMapper;
-public class AutoMapperProfile : Profile
+namespace UserService.Models
 {
-    public AutoMapperProfile()
+    public class AutoMapperProfile : Profile
     {
-        CreateMap<UserDTO, User>();        
-        //CreateMap<OrderDTO, Order>();
-        //CreateMap<FoodDTO, Food>();
-        //CreateMap<List<FoodDTO>, List<Food>>();
+        public AutoMapperProfile()
+        {
+            CreateMap<UserDTO, User>();
+        }
     }
 }

@@ -42,9 +42,9 @@ services:
     ports:
       - "8081:8080"
     networks:
-      - kittycatsuperfun
-
-    
+      - netSEN300
+    depends_on:
+      - SEN300UserClubServiceDBSqlServer
 
 volumes:
   sqlservervolume:
