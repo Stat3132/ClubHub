@@ -8,24 +8,24 @@ namespace UserService.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid clubID { get; set; }
+        public required Guid clubID { get; set; }
 
         [Required]
         [StringLength(50)]
-        public string clubName { get; set; }
+        public required string clubName { get; set; }
 
         [Required]
-        public string clubDeclaration { get; set; }
+        public required string clubDeclaration { get; set; }
 
         [Required]
         [StringLength(60)]
-        public string presidentName { get; set; }
+        public required string presidentName { get; set; }
 
         [Required]
-        public Guid presidentID { get; set; }
+        public required Guid presidentID { get; set; }
 
         [Required]
-        public Guid advisorID { get; set; }
+        public required Guid advisorID { get; set; }
 
         public override string ToString()
         {

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using UserService.Models;
 
 // eureka
 using Steeltoe.Discovery.Client;
@@ -17,7 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // EF Core
-builder.Services.AddDbContext<OrderServiceDBContext>(options =>
+builder.Services.AddDbContext<ClubHubDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("conn_orderservice_sqlserver")));
 
 // Controllers + JSON serialization

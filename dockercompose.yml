@@ -31,20 +31,18 @@ services:
     networks:
       - kittycatsuperfun
   
-  SEN300BookServiceAPI:
-    container_name: SEN300BookServiceAPI
+  PRO290ClubServiceAPI:
+    container_name: PRO290ClubServiceAPI
     build:
       context: ./ClubService
       dockerfile: Dockerfile
     #image: sen300bookserviceapi:1 FIND OUT HOW THIS WORKS
     restart: always
-    hostname: SEN300BookServiceAPI
+    hostname: PRO290ClubServiceAPI
     ports:
       - "8081:8080"
     networks:
-      - netSEN300
-    depends_on:
-      - SEN300UserClubServiceDBSqlServer
+      - kittycatsuperfun
 
 volumes:
   sqlservervolume:

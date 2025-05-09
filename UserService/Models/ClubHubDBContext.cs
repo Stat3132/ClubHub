@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using pro290.clubhub;
-using UserAuthentication;
+using UserService;
 
 namespace UserService.Models
 {

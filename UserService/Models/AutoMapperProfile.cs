@@ -1,8 +1,11 @@
 using AutoMapper;
-public class AutoMapperProfile : Profile
+namespace UserService.Models
 {
-    public AutoMapperProfile()
+    public class AutoMapperProfile : Profile
     {
-        CreateMap<UserDTO, User>();
+        public AutoMapperProfile()
+        {
+            CreateMap<UserDTO, User>();
+        }
     }
 }

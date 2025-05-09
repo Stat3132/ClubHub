@@ -1,9 +1,9 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using UserAuthentication;
+using UserService.Models;
 
-namespace ClubHub.Api.Controllers;
+namespace UserService.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
