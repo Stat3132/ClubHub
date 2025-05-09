@@ -4,11 +4,11 @@ networks:
 
 services:
   # database for user/club data
-  SEN300UserClubServiceDBSqlServer:
-    container_name: SEN300UserClubServiceDBSqlServer
+  PRO290UserClubServiceDBSqlServer:
+    container_name: PRO290UserClubServiceDBSqlServer
     image: mcr.microsoft.com/mssql/server:2019-latest    
     restart: always
-    hostname: SEN300UserClubServiceDBSqlServer
+    hostname: PRO290UserClubServiceDBSqlServer
     ports:
       - "1433:1433"
     volumes:
@@ -18,21 +18,33 @@ services:
     environment:
       SA_PASSWORD: "abc12345!"
       ACCEPT_EULA: "Y"
+  PRO290UserServiceAPI:
+    container_name: PRO290UserServiceAPI
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    image: pro290userserviceapi:1
+    restart: always
+    hostname: PRO290UserServiceAPI
+    ports:
+      - "8085:8080"
+    networks:
+      - kittycatsuperfun
   
-  SEN300BookServiceAPI:
-    container_name: SEN300BookServiceAPI
+  PRO290ClubServiceAPI:
+    container_name: PRO290ClubServiceAPI
     build:
       context: ./ClubService
       dockerfile: Dockerfile
     #image: sen300bookserviceapi:1 FIND OUT HOW THIS WORKS
     restart: always
-    hostname: SEN300BookServiceAPI
+    hostname: PRO290ClubServiceAPI
     ports:
       - "8081:8080"
     networks:
-      - netSEN300
-    depends_on:
-      - SEN300UserClubServiceDBSqlServer
+      - kittycatsuperfun
+
+    
 
 volumes:
   sqlservervolume:

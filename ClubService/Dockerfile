@@ -1,4 +1,3 @@
-
 FROM maven:3.9-sapmachine-21 AS build
 COPY src /home/app/src
 COPY pom.xml /home/app
