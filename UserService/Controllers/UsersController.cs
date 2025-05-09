@@ -1,18 +1,19 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using UserAuthentication;
 
-namespace OrderService.Api.Controllers;
+namespace ClubHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly ILogger<UsersController> _logger;
-    private readonly OrderServiceDBContext _db;
+    private readonly ClubHubDBContext _db;
     private readonly IMapper _mapper;
 
-    public UsersController(ILogger<UsersController> logger, OrderServiceDBContext db, IMapper mapper)
+    public UsersController(ILogger<UsersController> logger, ClubHubDBContext db, IMapper mapper)
     {
         _logger = logger;
         _db = db;
@@ -34,27 +35,12 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpGet("withorders")]
-    public async Task<IActionResult> GetWithOrders()
+    [HttpGet("{userID:guid}")]
+    public async Task<IActionResult> GetById(Guid userID)
     {
         try
         {
-            var users = await _db.Users.Include(u => u.Orders).ToListAsync();
-            return Ok(new { Success = true, Message = "Users with orders returned.", Users = users });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving users with orders.");
-            return StatusCode(500, "Internal server error.");
-        }
-    }
-
-    [HttpGet("{userGuid:guid}")]
-    public async Task<IActionResult> GetById(Guid userGuid)
-    {
-        try
-        {
-            var user = await _db.Users.Include(u => u.Orders).FirstOrDefaultAsync(u => u.UserGuid == userGuid);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.userID == userID);
             if (user == null)
                 return NotFound(new { Success = false, Message = "User not found." });
 
@@ -72,23 +58,22 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email);
+            var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.email == userDTO.email);
             if (existingUser is not null)
                 return Ok(new
                 {
                     Success = true,
                     Message = "User already exists.",
-                    UserGuid = existingUser.UserGuid,
-                    Email = existingUser.Email
+                    userID = existingUser.userID,
+                    email = existingUser.email
                 });
 
             var user = _mapper.Map<User>(userDTO);
-            user.CreatedDate = DateTime.UtcNow;
 
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
 
-            return Ok(new { Success = true, Message = "User created.", UserGuid = user.UserGuid });
+            return Ok(new { Success = true, Message = "User created.", userID = user.userID });
         }
         catch (Exception ex)
         {
@@ -97,25 +82,20 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpPut("{userGuid:guid}")]
-    public async Task<IActionResult> Update(Guid userGuid, [FromBody] UserDTO userDTO)
+    [HttpPut("{userID:guid}")]
+    public async Task<IActionResult> Update(Guid userID, [FromBody] UserDTO userDTO)
     {
         try
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserGuid == userGuid);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.userID == userID);
             if (user is null)
                 return NotFound(new { Success = false, Message = "User not found." });
 
-            // Map incoming DTO properties onto the existing user entity
             _mapper.Map(userDTO, user);
-            // Optional: if you prefer manually updating specific properties, you could do:
-            // user.Username = userDTO.Username;
-            // user.Email = userDTO.Email;
-            // user.Password = userDTO.Password;
 
             await _db.SaveChangesAsync();
 
-            return Ok(new { Success = true, Message = "User updated.", UserGuid = user.UserGuid });
+            return Ok(new { Success = true, Message = "User updated.", userID = user.userID });
         }
         catch (Exception ex)
         {
@@ -124,19 +104,19 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpDelete("{userGuid:guid}")]
-    public async Task<IActionResult> Delete(Guid userGuid)
+    [HttpDelete("{userID:guid}")]
+    public async Task<IActionResult> Delete(Guid userID)
     {
         try
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserGuid == userGuid);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.userID == userID);
             if (user is null)
                 return NotFound(new { Success = false, Message = "User not found." });
 
             _db.Users.Remove(user);
             await _db.SaveChangesAsync();
 
-            return Ok(new { Success = true, Message = "User deleted.", UserGuid = user.UserGuid });
+            return Ok(new { Success = true, Message = "User deleted.", userID = user.userID });
         }
         catch (Exception ex)
         {

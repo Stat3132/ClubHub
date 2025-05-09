@@ -1,55 +1,65 @@
 using Microsoft.EntityFrameworkCore;
+using pro290.clubhub;
+using UserAuthentication;
 
-public class OrderServiceDBContext : DbContext
+namespace UserService.Models
 {
-    public OrderServiceDBContext(DbContextOptions<OrderServiceDBContext> options)
-        : base(options)
+    public class ClubHubDBContext : DbContext
     {
-    }
-
-    public DbSet<User> Users { get; set; } = null!;
-    public DbSet<Order> Orders { get; set; } = null!;
-    public DbSet<Food> Foods { get; set; } = null!;
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        // Configure Users
-        modelBuilder.Entity<User>(entity =>
+        public ClubHubDBContext(DbContextOptions<ClubHubDBContext> options)
+            : base(options)
         {
-            entity.HasKey(u => u.UserGuid);
-            entity.HasIndex(u => u.Email)
-                  .IsUnique(); // Unique email constraint
-            entity.Property(u => u.CreatedDate)
-                    .HasDefaultValueSql("GETUTCDATE()");
-        });
+        }
 
-        // Configure Orders
-        modelBuilder.Entity<Order>(entity =>
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Club> Clubs { get; set; } = null!;
+        public DbSet<UserClub> UserClubs { get; set; } = null!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            entity.HasKey(o => o.OrderGuid);
-            entity.Property(o => o.CreatedDate)
-                    .HasDefaultValueSql("GETUTCDATE()");
+            // Configure Users
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(u => u.userID);
+                entity.HasIndex(u => u.email)
+                      .IsUnique(); // Unique email constraint
 
-            // One-to-many: one User has many Orders
-            entity.HasOne(o => o.User)
-                    .WithMany(u => u.Orders)
-                    .HasForeignKey(o => o.UserGuid)
-                    .OnDelete(DeleteBehavior.Restrict);
-        });
+                entity.Property(u => u.role)
+                      .HasConversion<string>(); // Store enum as string
+            });
 
-        // Configure Foods
-        modelBuilder.Entity<Food>(entity =>
-        {
-            // Composite key: FoodID and OrderGuid
-            entity.HasKey(b => new { b.FoodID, b.OrderGuid });
-            entity.Property(b => b.CreatedDate)
-                    .HasDefaultValueSql("GETUTCDATE()");
+            // Configure Clubs
+            modelBuilder.Entity<Club>(entity =>
+            {
+                entity.HasKey(c => c.clubID);
 
-            // Many-to-one: many Foods belong to one Order
-            entity.HasOne(b => b.Order)
-                    .WithMany(o => o.Foods)
-                    .HasForeignKey(b => b.OrderGuid)
-                    .OnDelete(DeleteBehavior.Cascade);
-        });
+                // Relationships with User (President and Advisor)
+                entity.HasOne<User>()
+                      .WithMany()
+                      .HasForeignKey(c => c.presidentID)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne<User>()
+                      .WithMany()
+                      .HasForeignKey(c => c.advisorID)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configure UserClub (Junction Table)
+            modelBuilder.Entity<UserClub>(entity =>
+            {
+                entity.HasKey(uc => uc.userClubID);
+
+                entity.HasOne<User>()
+                      .WithMany()
+                      .HasForeignKey(uc => uc.userID)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne<Club>()
+                      .WithMany()
+                      .HasForeignKey(uc => uc.clubID)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
+        }
     }
 }
