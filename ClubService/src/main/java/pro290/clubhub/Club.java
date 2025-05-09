@@ -1,7 +1,9 @@
 package pro290.clubhub;
 
+import java.util.UUID;
+
 public class Club {
-    int clubID;
+    UUID clubID;
     String clubName;
     String clubDecleration;
     String clubPresidentName;
@@ -37,6 +39,12 @@ public class Club {
     }
     public void setAdvisorID(int advisorID) {
         this.advisorID = advisorID;
+    }
+    public UUID getClubID() {
+        return clubID;
+    }
+    public void setClubID(UUID clubID) {
+        this.clubID = clubID;
     }
     
 }
