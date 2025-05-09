@@ -22,7 +22,7 @@ public class FoodRestController {
 
     @GetMapping(path="")
     @ResponseStatus(code = HttpStatus.OK)
-    public List<Food> findAllFoods() {
+    public List<Clu> findAllFoods() {
         return foodsRepo.findAll();
     }
 
