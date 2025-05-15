@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "LKPN/fBqYILCLVC8uhMU6lXkQYYseHC45nyJyICD6C8=",
+  "Source": "OcelotAPIGateway",
+  "BasePath": "_content/OcelotAPIGateway",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
