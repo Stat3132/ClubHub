@@ -68,7 +68,7 @@ public class ClubRestController {
     @ResponseStatus(code = HttpStatus.OK)
     public List<Club> searchItems(@PathVariable(required = true) String searchText) {
         
-        return clubsRepo.findByFoodNameContainingIgnoreCase(searchText);
+        return clubsRepo.findByClubNameContainingIgnoreCase(searchText);
     }
 
     @PutMapping(path = "/{clubUUID}")

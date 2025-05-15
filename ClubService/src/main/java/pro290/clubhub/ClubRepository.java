@@ -13,5 +13,5 @@ public interface ClubRepository extends JpaRepository<Club, UUID> { // second pa
     //List<Food> findByTitleContainingIgnoreCase(String title);
 
     //Custom query to find foods in foodItem
-    List<Club> findByFoodNameContainingIgnoreCase(String foodName);
+    List<Club> findByClubNameContainingIgnoreCase(String clubName);
 }
