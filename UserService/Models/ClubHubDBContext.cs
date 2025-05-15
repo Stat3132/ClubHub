@@ -10,9 +10,9 @@ namespace UserService.Models
         {
         }
 
-        public DbSet<User> Users { get; set; } = null!;
-        public DbSet<Club> Clubs { get; set; } = null!;
-        public DbSet<UserClub> UserClubs { get; set; } = null!;
+        public DbSet<User> user { get; set; } = null!;
+        public DbSet<Club> club { get; set; } = null!;
+        public DbSet<UserClub> userclub { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

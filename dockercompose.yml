@@ -18,6 +18,7 @@ services:
     environment:
       SA_PASSWORD: "abc12345!"
       ACCEPT_EULA: "Y"
+
   PRO290UserServiceAPI:
     container_name: PRO290UserServiceAPI
     build:
@@ -43,6 +44,16 @@ services:
       - "8081:8080"
     networks:
       - kittycatsuperfun
+
+  SEN300EurekaRegistry:
+    container_name: SEN300EurekaRegistry
+    image: steeltoeoss/eureka-server:latest
+    restart: always
+    hostname: SEN300EurekaRegistry
+    ports:
+      - 8761:8761
+    networks:
+      - kittycatsuperfun 
 
 volumes:
   sqlservervolume:

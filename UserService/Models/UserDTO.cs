@@ -9,6 +9,7 @@ namespace UserService.Models
         public required string lastName { get; set; }
         public required string email { get; set; }
         public required string phoneNumber { get; set; }
+        public required string password { get; set; }
         public required Role role { get; set; }
     }
 }

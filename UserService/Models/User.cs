@@ -28,7 +28,7 @@ namespace UserService.Models
         public required string phoneNumber { get; set; }
 
         [Required]
-        public required byte[] password { get; set; }
+        public byte[] password { get; set; }
 
         [Required]
         [Column("role")]
