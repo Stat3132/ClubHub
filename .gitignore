@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+API_Gateway/obj/Debug/net9.0/OcelotAPIGateway.AssemblyInfo.cs
+API_Gateway/obj/Debug/net9.0/OcelotAPIGateway.AssemblyInfoInputs.cache
+API_Gateway/obj/Debug/net9.0/OcelotAPIGateway.assets.cache
+API_Gateway/obj/Debug/net9.0/OcelotAPIGateway.csproj.AssemblyReference.cache
+API_Gateway/obj/Debug/net9.0/OcelotAPIGateway.GeneratedMSBuildEditorConfig.editorconfig
