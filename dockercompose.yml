@@ -45,11 +45,11 @@ services:
     networks:
       - kittycatsuperfun
 
-  SEN300EurekaRegistry:
-    container_name: SEN300EurekaRegistry
+  PRO290EurekaRegistry:
+    container_name: PRO290EurekaRegistry
     image: steeltoeoss/eureka-server:latest
     restart: always
-    hostname: SEN300EurekaRegistry
+    hostname: PRO290EurekaRegistry
     ports:
       - 8761:8761
     networks:
