@@ -2,7 +2,13 @@ package pro290.clubhub;
 
 import java.util.UUID;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class Club {
+    
+    @Id
     UUID clubID;
     String clubName;
     String clubDecleration;
