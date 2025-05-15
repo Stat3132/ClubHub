@@ -2,6 +2,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserService.Models;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace UserService.Controllers;
 
@@ -25,7 +27,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var users = await _db.Users.ToListAsync();
+            var users = await _db.user.ToListAsync();
             return Ok(new { Success = true, Message = "All users returned.", Users = users });
         }
         catch (Exception ex)
@@ -40,7 +42,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.userID == userID);
+            var user = await _db.user.FirstOrDefaultAsync(u => u.userID == userID);
             if (user == null)
                 return NotFound(new { Success = false, Message = "User not found." });
 
@@ -58,7 +60,7 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.email == userDTO.email);
+            var existingUser = await _db.user.FirstOrDefaultAsync(u => u.email == userDTO.email);
             if (existingUser is not null)
                 return Ok(new
                 {
@@ -70,7 +72,13 @@ public class UsersController : ControllerBase
 
             var user = _mapper.Map<User>(userDTO);
 
-            await _db.Users.AddAsync(user);
+            // Hash the password before saving
+            using (var sha256 = SHA256.Create())
+            {
+                user.password = sha256.ComputeHash(Encoding.UTF8.GetBytes(userDTO.password));
+            }
+
+            await _db.user.AddAsync(user);
             await _db.SaveChangesAsync();
 
             return Ok(new { Success = true, Message = "User created.", userID = user.userID });
@@ -87,11 +95,17 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.userID == userID);
+            var user = await _db.user.FirstOrDefaultAsync(u => u.userID == userID);
             if (user is null)
                 return NotFound(new { Success = false, Message = "User not found." });
 
             _mapper.Map(userDTO, user);
+
+            // Hash the password before saving
+            using (var sha256 = SHA256.Create())
+            {
+                user.password = sha256.ComputeHash(Encoding.UTF8.GetBytes(userDTO.password));
+            }
 
             await _db.SaveChangesAsync();
 
@@ -109,11 +123,11 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.userID == userID);
+            var user = await _db.user.FirstOrDefaultAsync(u => u.userID == userID);
             if (user is null)
                 return NotFound(new { Success = false, Message = "User not found." });
 
-            _db.Users.Remove(user);
+            _db.user.Remove(user);
             await _db.SaveChangesAsync();
 
             return Ok(new { Success = true, Message = "User deleted.", userID = user.userID });

@@ -1,5 +1,5 @@
 package CommunicationService;
 
-public class Email {
+public class RabbitMQ {
     
 }

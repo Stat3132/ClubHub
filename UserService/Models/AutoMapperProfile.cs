@@ -5,7 +5,9 @@ namespace UserService.Models
     {
         public AutoMapperProfile()
         {
-            CreateMap<UserDTO, User>();
+            CreateMap<UserDTO, User>()
+                .ForMember(dest => dest.password, opt => opt.Ignore()) // ignore password
+                .ForMember(dest => dest.userID, opt => opt.Ignore()); // Ignore userID
         }
     }
 }

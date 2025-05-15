@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using UserService.Models;
 
-// eureka
+// TODO: add eureka
 using Steeltoe.Discovery.Client;
 using Steeltoe.Discovery.Eureka;
 
@@ -29,7 +29,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddAutoMapper(typeof(Program));
 
 
-// Eureka Discovery (if used)
+// TODO: Eureka Discovery (if used)
 builder.Services.AddDiscoveryClient(builder.Configuration);
 
 
@@ -50,6 +50,6 @@ app.MapControllers();
 
 
 // Required if Eureka is enabled. call is now obsolete, unnecessary
-app.UseDiscoveryClient(); 
+//app.UseDiscoveryClient(); 
 
 app.Run();
