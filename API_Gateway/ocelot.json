@@ -1,9 +1,9 @@
 {
   "Routes": [
     {
-      "ServiceName": "ClubService",
+      "ServiceName": "PRO290ClubServiceAPI",
       "DownstreamPathTemplate": "/{everything}",
-      "UpstreamPathTemplate": "/clubservice/{everything}",
+      "UpstreamPathTemplate": "/clubserviceapi/{everything}",
       "UpstreamHttpMethod": [
         "GET",
         "POST",
@@ -20,9 +20,9 @@
       }
     },
     {
-      "ServiceName": "SEN300BasketServiceAPI",
+      "ServiceName": "PRO290UserServiceAPI",
       "DownstreamPathTemplate": "/{everything}",
-      "UpstreamPathTemplate": "/basketserviceapi/{everything}",
+      "UpstreamPathTemplate": "/userserviceapi/{everything}",
       "UpstreamHttpMethod": [
         "GET",
         "POST",
@@ -39,7 +39,7 @@
       }
     },
     {
-      "ServiceName": "SEN300OrderServiceAPI",
+      "ServiceName": "",
       "DownstreamPathTemplate": "/{everything}",
       "UpstreamPathTemplate": "/orderserviceapi/{everything}",
       "UpstreamHttpMethod": [
