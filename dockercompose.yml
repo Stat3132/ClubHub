@@ -55,5 +55,29 @@ services:
     networks:
       - kittycatsuperfun 
 
+  PRO290OcelotAPIGateway:
+    container_name: PRO290OcelotAPIGateway
+    build:
+      context: ./API_Gateway
+      dockerfile: Dockerfile
+    image: pro290ocelotapigateway:1
+    restart: always
+    hostname: PRO290OcelotAPIGateway
+    ports:
+      - 5041:8080
+    networks:
+      - kittycatsuperfun
+  
+  PRO290MessageServiceQueueRabbitMQ:
+    container_name: PRO290MessageServiceQueueRabbitMQ
+    image: rabbitmq:3-management
+    restart: always
+    hostname: PRO290MessageServiceQueueRabbitMQ
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - kittycatsuperfun
+
 volumes:
   sqlservervolume:
