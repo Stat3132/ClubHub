@@ -13,8 +13,9 @@ public class Club {
     String clubName;
     String clubDecleration;
     String clubPresidentName;
-    int clubPresidentID;
-    int advisorID;
+    UUID clubPresidentID;
+    UUID advisorID;
+    
     
     public String getClubName() {
         return clubName;
@@ -34,16 +35,16 @@ public class Club {
     public void setClubPresidentName(String clubPresidentName) {
         this.clubPresidentName = clubPresidentName;
     }
-    public int getClubPresidentID() {
+    public UUID getClubPresidentID() {
         return clubPresidentID;
     }
-    public void setClubPresidentID(int clubPresidentID) {
+    public void setClubPresidentID(UUID clubPresidentID) {
         this.clubPresidentID = clubPresidentID;
     }
-    public int getAdvisorID() {
+    public UUID getAdvisorID() {
         return advisorID;
     }
-    public void setAdvisorID(int advisorID) {
+    public void setAdvisorID(UUID advisorID) {
         this.advisorID = advisorID;
     }
     public UUID getClubID() {
