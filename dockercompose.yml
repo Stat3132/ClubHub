@@ -78,6 +78,8 @@ services:
       - "5672:5672"
     networks:
       - kittycatsuperfun
+  
+
 
 volumes:
   sqlservervolume:
