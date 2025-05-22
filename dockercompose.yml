@@ -96,6 +96,17 @@ services:
       - PRO290EurekaRegistry
       - PRO290OcelotAPIGateway
 
+  
+  # database for Food serice
+  PRO290EventServiceDBMongo:
+    container_name: PRO290EventServiceDBMongo
+    image: mongo:latest
+    restart: always
+    hostname: PRO290EventServiceDBMongo
+    ports:
+      - "27017:27017"
+    networks:
+      - kittycatsuperfun
 
 volumes:
   sqlservervolume:
