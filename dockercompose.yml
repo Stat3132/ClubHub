@@ -78,6 +78,17 @@ services:
       - "5672:5672"
     networks:
       - kittycatsuperfun
+  
+  # database for Food serice
+  PRO290EventServiceDBMongo:
+    container_name: PRO290EventServiceDBMongo
+    image: mongo:latest
+    restart: always
+    hostname: PRO290EventServiceDBMongo
+    ports:
+      - "27017:27017"
+    networks:
+      - kittycatsuperfun
 
 volumes:
   sqlservervolume:
