@@ -80,21 +80,21 @@ services:
       - kittycatsuperfun
 
   PRO290MessageServiceAPI:
-    container_name: SEN300MessageServiceAPI
+    container_name: PRO290MessageServiceAPI
     build:
       context: ./MessageService
       dockerfile: Dockerfile
     image: sen300messageserviceapi:1
     restart: always
-    hostname: SEN300MessageServiceAPI
+    hostname: PRO290MessageServiceAPI
     ports:
       - "8086:8080"
     networks:
-      - netSEN300
+      - kittycatsuperfun
     depends_on:
-      - SEN300MessageServiceQueueRabbitMQ
-      - SEN300EurekaRegistry
-      - SEN300OcelotAPIGateway
+      - PRO290MessageServiceQueueRabbitMQ
+      - PRO290EurekaRegistry
+      - PRO290OcelotAPIGateway
 
 
 volumes:
