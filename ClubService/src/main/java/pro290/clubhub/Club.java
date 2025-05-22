@@ -2,19 +2,23 @@ package pro290.clubhub;
 
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+
 @Entity
 public class Club {
-    
+
     @Id
-    UUID clubID;
-    String clubName;
-    String clubDecleration;
-    String clubPresidentName;
-    int clubPresidentID;
-    int advisorID;
+    private UUID clubID;
+    private String clubName;
+    @Column(name = "clubDeclaration")
+    private String clubDeclaration;
+    private String presidentName;
+    private UUID presidentID;
+    private UUID advisorID;
+    
     
     public String getClubName() {
         return clubName;
@@ -22,28 +26,28 @@ public class Club {
     public void setClubName(String clubName) {
         this.clubName = clubName;
     }
-    public String getClubDecleration() {
-        return clubDecleration;
+    public String getClubDeclaration() {
+        return clubDeclaration;
     }
-    public void setClubDecleration(String clubDecleration) {
-        this.clubDecleration = clubDecleration;
+    public void setClubDeclaration(String clubDeclaration) {
+        this.clubDeclaration = clubDeclaration;
     }
     public String getClubPresidentName() {
-        return clubPresidentName;
+        return presidentName;
     }
     public void setClubPresidentName(String clubPresidentName) {
-        this.clubPresidentName = clubPresidentName;
+        this.presidentName = clubPresidentName;
     }
-    public int getClubPresidentID() {
-        return clubPresidentID;
+    public UUID getClubPresidentID() {
+        return presidentID;
     }
-    public void setClubPresidentID(int clubPresidentID) {
-        this.clubPresidentID = clubPresidentID;
+    public void setClubPresidentID(UUID presidentID) {
+        this.presidentID = presidentID;
     }
-    public int getAdvisorID() {
+    public UUID getAdvisorID() {
         return advisorID;
     }
-    public void setAdvisorID(int advisorID) {
+    public void setAdvisorID(UUID advisorID) {
         this.advisorID = advisorID;
     }
     public UUID getClubID() {

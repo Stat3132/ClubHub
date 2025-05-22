@@ -79,7 +79,6 @@ public class ClubRestController {
             throw new RuntimeException(
                     String.format("Path itemId %s did not match body itemId %s", clubUUID, club.getClubID()));
         }
-
         clubsRepo.save(club);
     }
 
@@ -100,7 +99,5 @@ public class ClubRestController {
     //     int month = createRandomIntBetween(1, 12);
     //     int year = createRandomIntBetween(startYear, endYear);
     //     return LocalDate.of(year, month, day);
-        
-    
     
 }
