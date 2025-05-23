@@ -90,7 +90,7 @@ services:
     ports:
       - "8086:8080"
     networks:
-      - netPRO290
+      - kittycatsuperfun
     depends_on:
       - PRO290MessageServiceQueueRabbitMQ
       - PRO290EurekaRegistry
