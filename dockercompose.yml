@@ -84,7 +84,7 @@ services:
     build:
       context: ./MessageService
       dockerfile: Dockerfile
-    image: sen300messageserviceapi:1
+    image: pro290messageserviceapi:1
     restart: always
     hostname: PRO290MessageServiceAPI
     ports:
@@ -107,6 +107,21 @@ services:
       - "27017:27017"
     networks:
       - kittycatsuperfun
+
+  PRO290EventServiceAPI:
+    container_name: PRO290EventServiceAPI
+    build:
+      context: ./EventService
+      dockerfile: Dockerfile
+    image: pro290eventserviceapi:1
+    restart: always
+    hostname: PRO290EventServiceAPI
+    ports:
+      - "8087:8000"
+    networks:
+      - kittycatsuperfun
+    environment:
+      - MONGO_URL=mongodb://PRO290EventServiceDBMongo:27017
 
 volumes:
   sqlservervolume:
