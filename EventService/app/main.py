@@ -3,6 +3,8 @@ from bson import ObjectId
 from app.database import events_collection
 from app.models import Event
 from fastapi.responses import JSONResponse
+from py_eureka_client import eureka_client
+import os
 
 app = FastAPI()
 
@@ -15,6 +17,23 @@ def serialize_event(event) -> dict:
         "eventCoordinator": event["eventCoordinator"],
         "eventCoordinatorsNumber": event["eventCoordinatorsNumber"],
     }
+
+@app.on_event("startup")
+async def register_to_eureka():
+    await eureka_client.init_async(
+        eureka_server=os.getenv("EUREKA_URL", "http://PRO290EurekaRegistry:8761/eureka"),
+        app_name="PRO290EventServiceAPI",
+        instance_port=8000,
+        instance_host="PRO290EventServiceAPI",
+        health_check_url="http://PRO290EventServiceAPI:8000/health",
+        home_page_url="http://PRO290EventServiceAPI:8000",
+        data_center_name="MyOwn"
+    )
+
+@app.get("/health")
+def health():
+    return {"status": "UP"}
+
 
 @app.post("/createevent", status_code=201)
 def create_event(event: Event):
