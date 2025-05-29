@@ -122,6 +122,8 @@ services:
       - kittycatsuperfun
     environment:
       - MONGO_URL=mongodb://PRO290EventServiceDBMongo:27017
+      - EUREKA_URL=http://PRO290EurekaRegistry:8761/eureka
+
 
   PRO290CustomerUI:
     container_name: PRO290CustomerUI

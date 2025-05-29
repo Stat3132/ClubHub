@@ -3,11 +3,11 @@ Completed Microservices
  - Ocelot API Gateway (Tommy)
  - Eureka Service Discovery (Tommy)
  - Club Service (Diego)
- - RabbitMQ (Message Queue)
+ - RabbitMQ (Message Queue) (Tommy)
+ - MongoDB for Events (Easy) (Tommy)
+ - Event Service (Medium) (Tommy)
 
 Incomplete Microservices
+ - Email Sender Service (Easy) (Tommy)
  - Club Management Service (Hard)
- - Email Sender Service (Easy)
- - Event Service (Medium)
- - MongoDB for Events (Easy)
  - Customer UI (React) (Diego) (Medium)
