@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using System.Net;
+using MessageService.Models;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -8,11 +9,11 @@ public class MessagesController : ControllerBase
 {
     private readonly ILogger<MessagesController> _logger;
     private readonly IMapper _mapper;
-    private readonly OrderServiceDBContext _db;
+    private readonly ClubHubDBContext _db;
     //private readonly IConfiguration _config;
     private readonly IOrderNotificationProducer _msgQueue;
 
-    public MessagesController(ILogger<MessagesController> logger, OrderServiceDBContext db, IMapper mapper, IOrderNotificationProducer msgQueue)
+    public MessagesController(ILogger<MessagesController> logger, ClubHubDBContext db, IMapper mapper, IOrderNotificationProducer msgQueue)
     {
         _logger = logger;
         _db = db;
@@ -36,14 +37,14 @@ public class MessagesController : ControllerBase
     {
         var notification = new OrderNotification
         {
-            UserGuid = Guid.NewGuid(),
-            OrderGuid = Guid.NewGuid(),
+            userID = Guid.NewGuid(),
+            clubID = Guid.NewGuid(),
             Name = "Test User",
             Email = "test@example.com",
             Message = "This is a test message from /test-msg-queue."
         };
         _msgQueue.SendMessage(notification);
-        _logger.LogInformation($"Sent Message: {notification.UserGuid}, {notification.OrderGuid}");
+        _logger.LogInformation($"Sent Message: {notification.userID}, {notification.clubID}");
 
         return Ok("Test message sent to queue.");
     }
@@ -56,9 +57,9 @@ public class MessagesController : ControllerBase
             return BadRequest("Notification cannot be null.");
         }
 
-        Console.WriteLine($"Received notification for user {notification.Name} ({notification.Email}) about Order {notification.OrderGuid}");
+        Console.WriteLine($"Received notification for user {notification.Name} ({notification.Email}) about Club {notification.clubID}");
         _msgQueue.SendMessage(notification);
-        _logger.LogInformation($"Sent Message to RabbitMsgQueue: {notification.UserGuid}, {notification.OrderGuid}");
+        _logger.LogInformation($"Sent Message to RabbitMsgQueue: {notification.userID}, {notification.clubID}");
 
         return Ok(new { Status = "Notification received" });
     }

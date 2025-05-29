@@ -56,6 +56,25 @@
         "Key": null,
         "Expiry": 0
       }
+    },
+    {
+      "ServiceName": "PRO290MessageServiceAPI",
+      "DownstreamPathTemplate": "/{everything}",
+      "UpstreamPathTemplate": "/messageserviceapi/{everything}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "FileCacheOptions": {
+        "TtlSeconds": 15
+      },
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection",
+        "Key": null,
+        "Expiry": 0
+      }
     }
   ],
   "GlobalConfiguration": {

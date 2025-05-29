@@ -17,6 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//HTTP client for cross service communication
+builder.Services.AddHttpClient();
+
 // EF Core
 builder.Services.AddDbContext<ClubHubDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("conn_orderservice_sqlserver")));

@@ -50,7 +50,7 @@ public class OrderNotificationConsumer : BackgroundService
         consumer.Received += (model, ea) =>
         {
             WriteTextLog(ea);
-            SendEmail(ea);
+            //SendEmail(ea);
         };
 
         _channel.BasicConsume(queue: "notifyQueue", autoAck: false, consumer: consumer);
@@ -75,29 +75,31 @@ public class OrderNotificationConsumer : BackgroundService
         Console.WriteLine("Messsage: " + orderNotification.Message);
         Console.WriteLine();
 
-        string subject = $"Your recent order with us: #{orderNotification.OrderGuid}";
-        string bodytext = $"Account #: {orderNotification.UserGuid}\nOrder #: {orderNotification.OrderGuid}\n\nDear {orderNotification.Name},\n\nThank you for recent order with us!\n\n{orderNotification.Message}\n\nSincerely,\n\n THE MANAGEMENT";
+        // TODO: Update code below to use custom body/subject
+        string subject = "Welcome to the club!";
+        string bodytext = $"User #: {orderNotification.userID}\nClub #: {orderNotification.clubID}\n\nDear {orderNotification.Name},\n\nThank you for Joining the club!\n\n{orderNotification.Message}\n\nSincerely,\n\n THE CLUBHUB";
 
         Console.WriteLine("Subject: " + subject);
         Console.WriteLine("Body: " + bodytext);
+
+        SendEmail(orderNotification.Email, subject, bodytext);
     }
 
-    private void SendEmail(BasicDeliverEventArgs ea)
+    private void SendEmail(string to, string subject, string body)
     {
-
         //Using simple & free Ethereal
         var client = new SmtpClient("smtp.ethereal.email", 587)
         {
-            Credentials = new NetworkCredential("MY ETHEREALUSERNAME", "MYETHEREALPASSWORD"),
+            Credentials = new NetworkCredential("alexzander.swift@ethereal.email", "QgjC6qEBKwvMyvN4Qx"),
             EnableSsl = true
         };
-        var mail = new MailMessage("from@test.com", "to@ethereal.email", "Hello", "This is a test!");
+        var mail = new MailMessage("from@test.com", to, subject, body);
         client.Send(mail);
     }
 
-    private void OnConsumerConsumerCancelled(object sender, ConsumerEventArgs e) { }
-    private void OnConsumerUnregistered(object sender, ConsumerEventArgs e) { }
-    private void OnConsumerRegistered(object sender, ConsumerEventArgs e) { }
-    private void OnConsumerShutdown(object sender, ShutdownEventArgs e) { }
-    private void RabbitMQ_ConnectionShutdown(object sender, ShutdownEventArgs e) { }
+    private void OnConsumerConsumerCancelled(object? sender, ConsumerEventArgs e) { }
+    private void OnConsumerUnregistered(object? sender, ConsumerEventArgs e) { }
+    private void OnConsumerRegistered(object? sender, ConsumerEventArgs e) { }
+    private void OnConsumerShutdown(object? sender, ShutdownEventArgs e) { }
+    private void RabbitMQ_ConnectionShutdown(object? sender, ShutdownEventArgs e) { }
 }

@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Models;
 using System.Security.Cryptography;
 using System.Text;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 namespace UserService.Controllers;
 
@@ -11,15 +13,17 @@ namespace UserService.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<UsersController> _logger;
     private readonly ClubHubDBContext _db;
     private readonly IMapper _mapper;
 
-    public UsersController(ILogger<UsersController> logger, ClubHubDBContext db, IMapper mapper)
+    public UsersController(ILogger<UsersController> logger, ClubHubDBContext db, IMapper mapper, IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
         _db = db;
         _mapper = mapper;
+        _httpClientFactory = httpClientFactory;
     }
 
     [HttpGet]
@@ -80,6 +84,24 @@ public class UsersController : ControllerBase
 
             await _db.user.AddAsync(user);
             await _db.SaveChangesAsync();
+
+            // Send notification to MessageService
+            var notification = new
+            {
+                userID = user.userID,
+                clubID = Guid.Empty, // or assign a club if available
+                Name = $"{user.firstName} {user.lastName}",
+                Email = user.email,
+                Message = "Welcome to ClubHub! Your account has been created."
+            };
+
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.PostAsJsonAsync("http://PRO290OcelotAPIGateway:8080/messageserviceapi/api/messages", notification);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Failed to notify MessageService for user {UserID}", user.userID);
+            }
 
             return Ok(new { Success = true, Message = "User created.", userID = user.userID });
         }
