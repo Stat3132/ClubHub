@@ -1,0 +1,22 @@
+<html lang="en">
+<head><meta charset="UTF-8"><title>Manage Club</title></head>
+<body>
+  <h1>Manage {{clubName}}</h1>
+  <form method="POST" action="/updateClub">
+    <label>Club Declaration:<textarea name="clubDeclaration">{{clubDeclaration}}</textarea></label><br>
+    <button type="submit">Update Declaration</button>
+  </form>
+
+  <h2>Members</h2>
+  <ul>
+    {% for member in members %}
+    <li>{{member.firstName}} {{member.lastName}} <a href="/removeMember/{{member.userID}}">Remove</a></li>
+    {% endfor %}
+  </ul>
+  <form method="POST" action="/addMember">
+    <input type="hidden" name="clubID" value="{{clubID}}">
+    <label>User Email:<input type="email" name="email"></label>
+    <button type="submit">Add Member</button>
+  </form>
+</body>
+</html>

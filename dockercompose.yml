@@ -123,5 +123,20 @@ services:
     environment:
       - MONGO_URL=mongodb://PRO290EventServiceDBMongo:27017
 
+  PRO290CustomerUI:
+    container_name: PRO290CustomerUI
+    build:
+      context: ./customerui
+      dockerfile: Dockerfile
+    image: pro290customerui:1
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./customerui:/app   # <--- mount host folder into container
+    networks:
+      - kittycatsuperfun
+
+
 volumes:
   sqlservervolume:
