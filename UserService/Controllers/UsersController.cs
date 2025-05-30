@@ -6,8 +6,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Net.Http;
 using System.Net.Http.Json;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace UserService.Controllers;
+
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,12 +23,20 @@ public class UsersController : ControllerBase
     private readonly ClubHubDBContext _db;
     private readonly IMapper _mapper;
 
-    public UsersController(ILogger<UsersController> logger, ClubHubDBContext db, IMapper mapper, IHttpClientFactory httpClientFactory)
+    private readonly IConfiguration _configuration;
+
+    public UsersController(
+        ILogger<UsersController> logger,
+        ClubHubDBContext db,
+        IMapper mapper,
+        IHttpClientFactory httpClientFactory,
+        IConfiguration configuration)
     {
         _logger = logger;
         _db = db;
         _mapper = mapper;
         _httpClientFactory = httpClientFactory;
+        _configuration = configuration;
     }
 
     [HttpGet]
@@ -112,6 +125,52 @@ public class UsersController : ControllerBase
         }
     }
 
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
+    {
+        Console.WriteLine($"Login attempt: Email={loginDto.Email}, Password={loginDto.Password}");
+        if (string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
+            return BadRequest(new { Success = false, Message = "Email and password are required." });
+
+        var user = await _db.user.FirstOrDefaultAsync(u => u.email == loginDto.Email);
+        if (user == null)
+            return Unauthorized(new { Success = false, Message = "Invalid credentials." });
+
+        // Hash the provided password and compare
+        using (var sha256 = SHA256.Create())
+        {
+            var hashed = sha256.ComputeHash(Encoding.UTF8.GetBytes(loginDto.Password));
+            Console.WriteLine($"Password hashed: {BitConverter.ToString(hashed).Replace("-", "")}");
+            if (!hashed.SequenceEqual(user.password))
+                return Unauthorized(new { Success = false, Message = "Invalid credentials." });
+        }
+
+        // Generate JWT
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, user.userID.ToString()),
+            new Claim(JwtRegisteredClaimNames.Email, user.email),
+            new Claim("name", $"{user.firstName} {user.lastName}")
+        };
+
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var token = new JwtSecurityToken(
+            issuer: _configuration["JwtSettings:Issuer"],
+            audience: _configuration["JwtSettings:Audience"],
+            claims: claims,
+            expires: DateTime.Now.AddHours(1),
+            signingCredentials: creds
+        );
+
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return Ok(new { Success = true, Token = tokenString });
+    }
+
+
     [HttpPut("{userID:guid}")]
     public async Task<IActionResult> Update(Guid userID, [FromBody] UserDTO userDTO)
     {
@@ -160,4 +219,6 @@ public class UsersController : ControllerBase
             return StatusCode(500, "Internal server error.");
         }
     }
+
+
 }
