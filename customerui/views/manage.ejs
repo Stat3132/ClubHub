@@ -1,22 +1,52 @@
+<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><title>Manage Club</title></head>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Manage Users</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    #searchInput {
+      width: 100%;
+      padding: 8px;
+      margin: 12px 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .user-item {
+      margin: 8px 0;
+      padding: 10px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+  </style>
+  <script>
+    function filterUsers() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const items = document.querySelectorAll('.user-item');
+      items.forEach(item => {
+        const clubs = item.dataset.clubs.toLowerCase();
+        item.style.display = clubs.includes(input) ? 'block' : 'none';
+      });
+    }
+  </script>
+</head>
 <body>
-  <h1>Manage {{clubName}}</h1>
-  <form method="POST" action="/updateClub">
-    <label>Club Declaration:<textarea name="clubDeclaration">{{clubDeclaration}}</textarea></label><br>
-    <button type="submit">Update Declaration</button>
-  </form>
+  <div class="form-container">
+    <h1>Admin Dashboard: Manage Users</h1>
 
-  <h2>Members</h2>
-  <ul>
-    {% for member in members %}
-    <li>{{member.firstName}} {{member.lastName}} <a href="/removeMember/{{member.userID}}">Remove</a></li>
-    {% endfor %}
-  </ul>
-  <form method="POST" action="/addMember">
-    <input type="hidden" name="clubID" value="{{clubID}}">
-    <label>User Email:<input type="email" name="email"></label>
-    <button type="submit">Add Member</button>
-  </form>
+    <input id="searchInput" type="text" placeholder="Search by club name..." oninput="filterUsers()">
+
+    <ul>
+      <% users.forEach(user => { %>
+        <li class="user-item" data-clubs="<%= user.clubs.map(c => c.clubName).join(',') %>">
+          <strong><%= user.firstName %> <%= user.lastName %></strong> - <%= user.email %> (<%= user.role %>)
+          <% if (user.clubs.length > 0) { %>
+            <div>Clubs: <%= user.clubs.map(c => c.clubName).join(', ') %></div>
+          <% } else { %>
+            <div>Clubs: None</div>
+          <% } %>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
 </body>
 </html>

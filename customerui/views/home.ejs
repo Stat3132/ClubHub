@@ -1,48 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="/css/style.css">
   <meta charset="UTF-8">
   <title>Home - ClubHub</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    header {
-      background-color: #333;
-      color: white;
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    nav a {
-      color: white;
-      margin: 0 10px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    main {
-      padding: 20px;
-    }
-    .club-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    .club-card {
-      border: 1px solid #ccc;
-      padding: 15px;
-      border-radius: 5px;
-      background-color: #f9f9f9;
-    }
-    .club-card h3 {
-      margin: 0 0 10px;
-    }
-  </style>
 </head>
 <body>
   <header>
     <div><strong>ClubHub</strong></div>
     <nav>
-      <a href="/create-club">Create Club</a>
+      <a href="/create-club">Create club declaration</a>
       <a href="/events">View All Events</a>
       <a href="/contact">Contact President/Teacher</a>
     </nav>
@@ -50,13 +17,16 @@
   <main>
     <h2>Available Clubs</h2>
     <div class="club-list">
-      <% clubs.forEach(function(club) { %>
-        <div class="club-card">
-          <h3><%= club.clubName %></h3>
-          <p><strong>President:</strong> <%= club.presidentName %></p>
-          <p><%= club.clubDeclaration %></p>
-        </div>
-      <% }); %>
+  <% clubs.forEach(function(club) { %>
+  <div class="club-card">
+    <h3><%= club.clubName %></h3>
+    <p><strong>President:</strong> <%= club.clubPresidentName %></p>
+    <p><strong>Club Declaration:</strong> <%= club.clubDeclaration %></p>
+  </div>
+<% }); %>
+
+</div>
+
     </div>
   </main>
 </body>
