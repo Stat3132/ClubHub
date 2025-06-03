@@ -1,14 +1,14 @@
 const express = require('express');
 const axios = require('axios');
-const crypto = require('crypto'); // ✅ Move this to the top for clarity
+const crypto = require('crypto'); 
 const router = express.Router();
 
-// ✅ Render the login page at the root
+// login page
 router.get('/', (req, res) => {
   res.render('login');
 });
 
-// ✅ Render the signup page
+// signup page
 router.get('/signup', (req, res) => {
   res.render('signup');
 });
@@ -27,10 +27,10 @@ router.post('/signup', async (req, res) => {
     });
 
     if (response.data.Success) {
-      // ✅ Redirect to login page after success
-      return res.redirect('/'); // or '/login' if you have a /login route
+      
+      return res.redirect('/'); 
     } else {
-      // Render signup page again with error
+      
       return res.render('signup', { error: response.data.Message });
     }
   } catch (err) {
@@ -43,49 +43,148 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const response = await axios.get('http://PRO290UserServiceAPI:8080/api/users');
-    const users = response.data.Users;
+    const response = await axios.post('http://PRO290UserServiceAPI:8080/api/users/login', {
+      Email: email,
+      Password: password
+    });
 
-    if (!users || !Array.isArray(users)) {
-      return res.render('login', { error: 'User list unavailable.' });
+    const data = response.data;
+
+    if (!data.success || !data.token) {
+      return res.render('login', { error: data.message || 'Invalid login.' });
     }
 
-    const user = users.find(u => u.email === email);
-    if (!user) {
-      return res.render('login', { error: 'User not found.' });
-    }
-
-    const hashedPassword = crypto.createHash('sha256').update(password).digest();
-
-    if (!user.password || !user.password.data) {
-      return res.render('login', { error: 'Invalid stored password format.' });
-    }
-
-    const storedPassword = Buffer.from(user.password.data);
-    if (Buffer.compare(storedPassword, hashedPassword) !== 0) {
-      return res.render('login', { error: 'Incorrect password.' });
-    }
-
-    return res.redirect('/club');
+    console.log('JWT Token:', data.token);
+    return res.redirect('/home');
   } catch (err) {
-    console.error(err.message);
-    return res.status(500).render('login', { error: 'Login failed. Try again.' });
+    console.error('Login error:', err.response?.data || err.message);
+    return res.status(401).render('login', { error: 'Login failed. Check your credentials.' });
   }
 });
 
-// ✅ Handle GET /club to render the club page
-router.get('/club', (req, res) => {
-  // For now, use dummy data — you can fetch real data from ClubService later
-  res.render('club', {
-    clubName: 'Test Club',
-    clubDeclaration: 'To build cool stuff',
-    presidentName: 'Jane Doe',
-    members: [
-      { firstName: 'Alice', lastName: 'Smith' },
-      { firstName: 'Bob', lastName: 'Johnson' }
-    ]
-  });
+router.get('/home', async (req, res) => {
+  try {
+    const response = await axios.get('http://PRO290ClubServiceAPI:8080/api/clubs');
+    const clubs = response.data.clubs || [];
+    res.render('home', { clubs });
+  } catch (err) {
+    console.error('Error fetching clubs:', err.message);
+    res.render('home', { clubs: [] });
+  }
 });
+
+const sql = require('mssql');
+
+const sqlConfig = {
+  user: 'sa',
+  password: 'abc12345!',
+  database: 'clubhub',
+  server: 'PRO290UserClubServiceDBSqlServer',
+  port: 1433,
+  options: {
+    encrypt: false, // if using self-hosted SQL Server (true for Azure)
+    trustServerCertificate: true
+  }
+};
+
+
+async function getClubUserDetails(presidentEmail, advisorEmail) {
+  try {
+    const pool = await sql.connect(sqlConfig);
+
+  const result = await pool.request()
+  .input('email1', sql.VarChar, presidentEmail.toLowerCase())
+  .input('email2', sql.VarChar, advisorEmail.toLowerCase())
+  .query(`
+    SELECT userID, LOWER(email) AS email, firstName, lastName FROM [user]
+    WHERE LOWER(email) = @email1 OR LOWER(email) = @email2
+  `);
+
+    const rows = result.recordset;
+    if (rows.length < 2) throw new Error("One or both emails not found");
+
+    let president = null, advisor = null;
+
+    for (const row of rows) {
+      if (row.email === presidentEmail) {
+        president = { id: row.userID, name: `${row.firstName} ${row.lastName}` };
+      } else if (row.email === advisorEmail) {
+        advisor = { id: row.userID };
+      }
+    }
+
+    if (!president || !advisor) throw new Error("Missing user roles");
+
+    return {
+      presidentID: president.id,
+      presidentName: president.name,
+      advisorID: advisor.id
+    };
+  } catch (err) {
+    console.error('SQL error:', err);
+    throw err;
+  }
+}
+
+
+router.get('/create-club', (req, res) => {
+  res.render('createclub');
+});
+
+router.post('/create-club', async (req, res) => {
+  const { clubName, clubDeclaration, presidentEmail, advisorEmail } = req.body;
+
+  try {
+    const { presidentID, presidentName, advisorID } = await getClubUserDetails(presidentEmail, advisorEmail);
+
+    const response = await axios.post('http://PRO290ClubServiceAPI:8080/api/clubs', {
+      clubName,
+      clubDeclaration,
+      presidentName,
+      presidentID,
+      advisorID
+    });
+
+    if (response.data.success) {
+      return res.redirect('/home');
+    } else {
+      return res.render('createclub', { error: response.data.message });
+    }
+
+  } catch (err) {
+    console.error('Error creating club:', err.message);
+    return res.status(500).render('createclub', { error: 'Failed to create club. ' + err.message });
+  }
+});
+
+
+router.post('/contact', async (req, res) => {
+  const { senderName, senderEmail, recipientEmail, message } = req.body;
+  try {
+    await axios.post('http://PRO290MessageServiceAPI:8080/api/messages', {
+      senderName,
+      senderEmail,
+      recipientEmail,
+      message
+    });
+    res.redirect('/home');
+  } catch (err) {
+    console.error('Error sending message:', err.message);
+    res.status(500).send('Failed to send message.');
+  }
+});
+
+router.get('/events', async (req, res) => {
+  try {
+    const response = await axios.get('http://PRO290EventServiceAPI:8080/api/events');
+    res.render('event', { events: response.data.events || [] });
+  } catch (err) {
+    console.error('Error fetching events:', err.message);
+    res.render('event', { events: [] });
+  }
+});
+
+
 
 
 module.exports = router;
