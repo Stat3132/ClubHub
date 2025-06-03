@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Event to Club</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Add Event</h1>
+  <form method="POST" action="/addEvent">
+    <label>Club ID: <input type="text" name="clubID" required></label><br>
+    <label>Event Title: <input type="text" name="eventTitle" required></label><br>
+    <label>Description:</label><br>
+    <textarea name="eventDescription" rows="4" required></textarea><br>
+    <button type="submit">Add Event</button>
+  </form>
+</body>
+</html>

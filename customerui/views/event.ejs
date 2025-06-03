@@ -1,11 +1,27 @@
+<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><title>Events</title></head>
+<head>
+  <meta charset="UTF-8">
+  <title>All Events</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
 <body>
-  <h1>Club Events</h1>
-  <ul>
-    {% for event in events %}
-    <li><strong>{{event.title}}</strong> - {{event.eventDate}} @ {{event.location}}</li>
-    {% endfor %}
-  </ul>
+  <h1>Upcoming Events</h1>
+
+  <% if (events.length > 0) { %>
+    <ul>
+      <% events.forEach(event => { %>
+        <li>
+          <strong><%= event.name %></strong> – <%= event.date %> <br>
+          Hosted by: <%= event.hostedBy %><br>
+          <%= event.description %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>No events found.</p>
+  <% } %>
+
+  <a class="btn-secondary" href="/home">← Back to Home</a>
 </body>
 </html>

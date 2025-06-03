@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8">
+  <title>Home - ClubHub</title>
+</head>
+<body>
+  <header>
+    <div><strong>ClubHub</strong></div>
+    <nav>
+      <a href="/create-club">Create club declaration</a>
+      <a href="/events">View All Events</a>
+      <a href="/contact">Contact President/Teacher</a>
+    </nav>
+  </header>
+  <main>
+    <h2>Available Clubs</h2>
+    <div class="club-list">
+  <% clubs.forEach(function(club) { %>
+  <div class="club-card">
+    <h3><%= club.clubName %></h3>
+    <p><strong>President:</strong> <%= club.clubPresidentName %></p>
+    <p><strong>Club Declaration:</strong> <%= club.clubDeclaration %></p>
+  </div>
+<% }); %>
+
+</div>
+
+    </div>
+  </main>
+</body>
+</html>

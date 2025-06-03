@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin User Management</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      background-color: #e6f2fb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .layout {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 40px auto;
+    }
+
+    .user-section {
+      flex: 3;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-panel {
+      flex: 1.2;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      color: #003366;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 25px;
+      font-size: 16px;
+    }
+
+    .user-list li {
+      padding: 10px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .admin-panel button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .admin-panel button:hover {
+      background-color: #005b99;
+    }
+  </style>
+  <script>
+    function filterUsers() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const items = document.querySelectorAll('.user-item');
+      items.forEach(item => {
+        const content = item.textContent.toLowerCase();
+        item.style.display = content.includes(input) ? 'block' : 'none';
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="layout">
+    <!-- Left section: user list -->
+    <div class="user-section">
+      <h1>Admin - All Users</h1>
+
+      <input
+        id="searchInput"
+        type="text"
+        class="search-input"
+        placeholder="Search users by name, email, or club..."
+        oninput="filterUsers()"
+      />
+
+      <ul class="user-list">
+        <% users.forEach(user => { %>
+          <li class="user-item">
+            <strong><%= user.firstName %> <%= user.lastName %></strong><br>
+            Email: <%= user.email %><br>
+            Role: <%= user.role %><br>
+            <% if (user.clubs && user.clubs.length > 0) { %>
+              Clubs:
+              <ul>
+                <% user.clubs.forEach(club => { %>
+                  <li><%= club.clubName %></li>
+                <% }) %>
+              </ul>
+            <% } else { %>
+              <em>No club assigned</em>
+            <% } %>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+
+    <!-- Right section: admin actions -->
+    <div class="admin-panel">
+      <h2>Admin Actions</h2>
+      <form action="/approveClubRequest" method="GET">
+        <button type="submit">Approve Club Requests</button>
+      </form>
+
+      <form action="/addMember" method="GET">
+        <button type="submit">Add Users to Clubs</button>
+      </form>
+
+      <form action="/removeMember" method="GET">
+        <button type="submit">Remove Users from Clubs</button>
+      </form>
+
+      <form action="/addEvent" method="GET">
+        <button type="submit">Add Events to Clubs</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Contact a Club President or Teacher</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Contact Form</h1>
+  <form method="POST" action="/contact">
+    <label>Your Name: <input type="text" name="senderName" required></label><br>
+    <label>Your Email: <input type="email" name="senderEmail" required></label><br>
+    <label>Recipient (President/Teacher Email): <input type="email" name="recipientEmail" required></label><br>
+    <label>Message:<br>
+      <textarea name="message" rows="5" required></textarea>
+    </label><br>
+    <button type="submit">Send</button>
+  </form>
+
+  <a class="btn-secondary" href="/home">← Back to Home</a>
+</body>
+</html>

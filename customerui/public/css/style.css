@@ -1,0 +1,199 @@
+:root {
+  --primary-color: #4a90e2;       /* Blue */
+  --secondary-color: #e3f2fd;     /* Soft light blue background */
+  --accent-color: #00bfa6;        /* Teal accent */
+  --text-color: #2c3e50;          /* Dark blue-gray */
+  --bg-color: #fdfdfd;
+  --nav-color: #3a3f51;
+  --highlight-color: #ffe082;     /* Light amber for attention */
+
+  --success-color: #66bb6a;
+  --error-color: #ef5350;
+
+  --border-radius: 10px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+  color: white;
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+
+header strong {
+  font-size: 1.7rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+nav a {
+  color: white;
+  margin: 0 14px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+nav a:hover {
+  color: var(--highlight-color);
+  text-decoration: underline;
+}
+main {
+  padding: 40px;
+  background-color: var(--secondary-color);
+}
+
+h2 {
+  font-size: 2.2rem;
+  margin-bottom: 28px;
+  color: var(--nav-color);
+}
+.card-grid, .club-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 24px;
+}
+
+.card, .club-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 5px solid var(--accent-color);
+}
+
+.card:hover, .club-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.club-card h3 {
+  margin-top: 0;
+  color: var(--primary-color);
+}
+
+.club-card p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+form {
+  background-color: white;
+  padding: 32px;
+  border-radius: var(--border-radius);
+  max-width: 500px;
+  margin: 30px auto;
+  box-shadow: var(--shadow);
+  border-top: 5px solid var(--accent-color);
+}
+
+label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--nav-color);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  margin-top: 4px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+button {
+  background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background: var(--primary-color);
+}
+.success-message {
+  background-color: var(--success-color);
+  color: white;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.error-message {
+  background-color: var(--error-color);
+  color: white;
+  padding: 12px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  text-align: center;
+}
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav {
+    margin-top: 10px;
+  }
+
+  main {
+    padding: 20px;
+  }
+
+  .card-grid, .club-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-secondary {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.form-container {
+  max-width: 600px;
+  margin: 60px auto;
+  background-color: white;
+  padding: 40px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
