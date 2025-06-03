@@ -47,6 +47,8 @@ public class ClubRestController {
         return new String();
     }
 
+    //TODO: Fix this part to get authorization working (spring-boot-starter-oauth2-jose)
+
     @PostMapping(path="")
     @ResponseStatus(code = HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('ADVISOR', 'ADMIN')")
