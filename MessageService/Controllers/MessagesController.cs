@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using System.Net;
 using MessageService.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -50,8 +52,22 @@ public class MessagesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize]
     public IActionResult SendNotification([FromBody] OrderNotification notification)
     {
+        // Only allow advisors and admins
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        if (role != "Admin")
+        {
+            Console.WriteLine($"Error, not admin, admin: {role}");
+            return StatusCode(403, new { Success = false, Message = "Only admins can send notifications." });
+        }
+        else
+        {
+            Console.WriteLine($"Passed, Role: {role}");
+        }
+
         if (notification == null)
         {
             return BadRequest("Notification cannot be null.");

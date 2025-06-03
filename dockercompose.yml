@@ -91,10 +91,6 @@ services:
       - "8086:8080"
     networks:
       - kittycatsuperfun
-    depends_on:
-      - PRO290MessageServiceQueueRabbitMQ
-      - PRO290EurekaRegistry
-      - PRO290OcelotAPIGateway
 
   
   # database for Food serice

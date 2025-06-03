@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserService.Models;
+using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Net.Http;
@@ -9,6 +10,7 @@ using System.Net.Http.Json;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserService.Controllers;
 
@@ -40,8 +42,17 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAll()
     {
+        // Only allow advisors and admins
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        if (role != "Advisor" && role != "Admin")
+        {
+            return StatusCode(403, new { Success = false, Message = "Only advisors and admins can access all users." });
+        }
+
         try
         {
             var users = await _db.user.ToListAsync();
@@ -108,7 +119,30 @@ public class UsersController : ControllerBase
                 Message = "Welcome to ClubHub! Your account has been created."
             };
 
+            // Get the admin/service JWT token from config
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, "0708D4E0-DBF1-405F-18A7-08DD9F49D6F8"),
+                new Claim(JwtRegisteredClaimNames.Email, "testtest@example.com"),
+                new Claim(ClaimTypes.Role, "Admin")
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JwtSettings:Issuer"],
+                audience: _configuration["JwtSettings:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(10),
+                signingCredentials: creds
+            );
+
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
             var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenString);
+
             var response = await client.PostAsJsonAsync("http://PRO290OcelotAPIGateway:8080/messageserviceapi/api/messages", notification);
 
             if (!response.IsSuccessStatusCode)
@@ -132,7 +166,11 @@ public class UsersController : ControllerBase
         if (string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
             return BadRequest(new { Success = false, Message = "Email and password are required." });
 
+
         var user = await _db.user.FirstOrDefaultAsync(u => u.email == loginDto.Email);
+        Console.WriteLine(user.email);
+        Console.WriteLine(user.role);
+
         if (user == null)
             return Unauthorized(new { Success = false, Message = "Invalid credentials." });
 
@@ -150,7 +188,8 @@ public class UsersController : ControllerBase
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.userID.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.email),
-            new Claim("name", $"{user.firstName} {user.lastName}")
+            new Claim("name", $"{user.firstName} {user.lastName}"),
+            new Claim(ClaimTypes.Role, user.role.ToString())
         };
 
 
@@ -172,8 +211,17 @@ public class UsersController : ControllerBase
 
 
     [HttpPut("{userID:guid}")]
+    [Authorize]
     public async Task<IActionResult> Update(Guid userID, [FromBody] UserDTO userDTO)
     {
+        // Only allow advisors and admins
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        if (role != "Advisor" && role != "Admin")
+        {
+            return StatusCode(403, new { Success = false, Message = "Only advisors and admins can access all users." });
+        }
+
         try
         {
             var user = await _db.user.FirstOrDefaultAsync(u => u.userID == userID);
@@ -200,8 +248,17 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{userID:guid}")]
+    [Authorize]
     public async Task<IActionResult> Delete(Guid userID)
     {
+        // Only allow advisors and admins
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        if (role != "Advisor" && role != "Admin")
+        {
+            return StatusCode(403, new { Success = false, Message = "Only advisors and admins can access all users." });
+        }
+
         try
         {
             var user = await _db.user.FirstOrDefaultAsync(u => u.userID == userID);
