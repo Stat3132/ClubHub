@@ -83,10 +83,11 @@ def get_event(id: str):
     return serialize_event(event)
 
 
-@app.get("/getevent", status_code=201)
+@app.get("/api/events")
 def get_all_events():
     events = events_collection.find()
-    return [serialize_event(event) for event in events]
+    return {"events": [serialize_event(e) for e in events]}
+
 
 
 @app.put("/updateevent/{id}", status_code=201, dependencies=[Depends(advisor_or_admin)])

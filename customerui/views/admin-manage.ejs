@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Admin User Management</title>
+  <title>Admin - User Management</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
     body {
@@ -47,10 +47,39 @@
       font-size: 16px;
     }
 
-    .user-list li {
-      padding: 10px;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #ddd;
+    .user-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #ffffff;
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .remove-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .remove-btn:hover {
+      background-color: #c0392b;
     }
 
     .admin-panel button {
@@ -69,23 +98,12 @@
       background-color: #005b99;
     }
   </style>
-  <script>
-    function filterUsers() {
-      const input = document.getElementById('searchInput').value.toLowerCase();
-      const items = document.querySelectorAll('.user-item');
-      items.forEach(item => {
-        const content = item.textContent.toLowerCase();
-        item.style.display = content.includes(input) ? 'block' : 'none';
-      });
-    }
-  </script>
 </head>
 <body>
   <div class="layout">
-    <!-- Left section: user list -->
+    <!-- User List -->
     <div class="user-section">
       <h1>Admin - All Users</h1>
-
       <input
         id="searchInput"
         type="text"
@@ -97,43 +115,80 @@
       <ul class="user-list">
         <% users.forEach(user => { %>
           <li class="user-item">
-            <strong><%= user.firstName %> <%= user.lastName %></strong><br>
-            Email: <%= user.email %><br>
-            Role: <%= user.role %><br>
-            <% if (user.clubs && user.clubs.length > 0) { %>
-              Clubs:
-              <ul>
-                <% user.clubs.forEach(club => { %>
-                  <li><%= club.clubName %></li>
-                <% }) %>
-              </ul>
-            <% } else { %>
-              <em>No club assigned</em>
-            <% } %>
+            <div class="user-info">
+              <strong><%= user.firstName %> <%= user.lastName %></strong><br>
+              Email: <%= user.email %><br>
+              Role: <%= user.role %><br>
+              <% if (user.clubs && user.clubs.length > 0) { %>
+                Clubs:
+                <ul>
+                  <% user.clubs.forEach(club => { %>
+                    <li><%= club.clubName %></li>
+                  <% }) %>
+                </ul>
+              <% } else { %>
+                <em>No club assigned</em>
+              <% } %>
+            </div>
+
+            <button
+              class="remove-btn"
+              onclick="removeUser('<%= user.userID %>', '<%= user.firstName + ' ' + user.lastName %>')"
+            >
+              Remove
+            </button>
           </li>
-        <% }); %>
+        <% }) %>
       </ul>
     </div>
 
-    <!-- Right section: admin actions -->
+    <!-- Admin Actions -->
     <div class="admin-panel">
       <h2>Admin Actions</h2>
       <form action="/approveClubRequest" method="GET">
         <button type="submit">Approve Club Requests</button>
       </form>
-
       <form action="/addMember" method="GET">
         <button type="submit">Add Users to Clubs</button>
       </form>
-
       <form action="/removeMember" method="GET">
         <button type="submit">Remove Users from Clubs</button>
       </form>
-
       <form action="/addEvent" method="GET">
         <button type="submit">Add Events to Clubs</button>
       </form>
     </div>
   </div>
+
+  <script>
+    function filterUsers() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const items = document.querySelectorAll('.user-item');
+      items.forEach(item => {
+        const content = item.textContent.toLowerCase();
+        item.style.display = content.includes(input) ? 'flex' : 'none';
+      });
+    }
+
+    async function removeUser(userID, userName) {
+      if (!confirm(`Are you sure you want to remove ${userName}?`)) return;
+
+      try {
+        const res = await fetch('/remove-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ userID, userName })
+        });
+
+        const result = await res.json();
+        alert(result.message);
+        if (result.success) location.reload();
+      } catch (err) {
+        alert(`❌ Failed to remove ${userName}.`);
+      }
+    }
+  </script>
 </body>
 </html>

@@ -247,35 +247,26 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpDelete("{userID:guid}")]
     [Authorize]
-    public async Task<IActionResult> Delete(Guid userID)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(Guid id)
     {
-        // Only allow advisors and admins
-        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    _logger.LogInformation($"🔴 Attempt to delete user with ID: {id}");
 
-        if (role != "Advisor" && role != "Admin")
-        {
-            return StatusCode(403, new { Success = false, Message = "Only advisors and admins can access all users." });
-        }
-
-        try
-        {
-            var user = await _db.user.FirstOrDefaultAsync(u => u.userID == userID);
-            if (user is null)
-                return NotFound(new { Success = false, Message = "User not found." });
-
-            _db.user.Remove(user);
-            await _db.SaveChangesAsync();
-
-            return Ok(new { Success = true, Message = "User deleted.", userID = user.userID });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting user.");
-            return StatusCode(500, "Internal server error.");
-        }
+    var user = await _db.user.FindAsync(id); // or _db.Users if your DbSet is named that
+    if (user == null)
+    {
+        _logger.LogWarning($"⚠️ User not found: {id}");
+        return NotFound(new { Success = false, Message = "User not found." });
     }
+
+    _db.user.Remove(user);
+    await _db.SaveChangesAsync();
+
+    _logger.LogInformation($"✅ User removed: {id}");
+    return Ok(new { Success = true, Message = "User deleted." });
+}
+
 
 
 }

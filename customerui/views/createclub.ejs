@@ -2,23 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Create Club</title>
+  <title>Request Club Creation</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <div class="form-container">
-    <h1>Create a New Club</h1>
+    <h1>Request to Create a New Club</h1>
+
     <form method="POST" action="/create-club">
-      <label>Club Name: <input type="text" name="clubName" required></label><br>
-      <label>Declaration: <textarea name="clubDeclaration" required></textarea></label><br>
-      <label>President email: <input type="text" name="presidentEmail" required></label><br>
-      <label>Advisor email: <input type="text" name="advisorEmail" required></label><br>
-      <button type="submit">Create Club</button>
+      <label>Club Name:
+        <input type="text" name="clubName" required>
+      </label><br>
+
+      <label>Declaration:
+        <textarea name="clubDeclaration" required></textarea>
+      </label><br>
+
+      <label>Your Name:
+        <input type="text" name="studentName" required>
+      </label><br>
+
+      <label>Your Email:
+        <input type="email" name="studentEmail" required>
+      </label><br>
+
+      <label>Why should this club be created?
+        <textarea name="reasonToCreate" required></textarea>
+      </label><br>
+
+      <button type="submit">Submit Request</button>
     </form>
 
     <% if (typeof success !== 'undefined' && success) { %>
       <div class="success-message">
-        ✅ Club '<%= clubName %>' created successfully!
+        ✅ Request for '<%= clubName %>' submitted successfully!
       </div>
     <% } %>
 
