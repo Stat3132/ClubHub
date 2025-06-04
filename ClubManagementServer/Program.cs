@@ -70,7 +70,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Optional test route
-app.MapGet("/security/getMessage", () => "Hello World!").RequireAuthorization();
+//app.MapGet("/security/getMessage", () => "Hello World!").RequireAuthorization();
 
 // Required if Eureka is enabled. call is now obsolete, unnecessary
 //app.UseDiscoveryClient(); 

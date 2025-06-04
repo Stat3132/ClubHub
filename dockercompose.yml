@@ -144,7 +144,7 @@ services:
   PRO290ClubManagementServiceAPI:
     container_name: PRO290ClubManagementServiceAPI
     build:
-      context: ./UserService
+      context: ./ClubManagementServer
       dockerfile: Dockerfile
     image: pro290clubmanagementserviceapi:1
     restart: always
