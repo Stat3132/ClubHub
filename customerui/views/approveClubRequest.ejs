@@ -1,14 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Approve Club Request</title>
+  <meta charset="UTF-8">
+  <title>Approve Club Requests</title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .request-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      background-color: #fff;
+    }
+
+    .request-actions {
+      margin-top: 10px;
+    }
+
+    .btn-approve, .btn-deny {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-approve {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-deny {
+      background-color: #dc3545;
+      color: white;
+      margin-left: 8px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Approve Club Request</h1>
-  <form method="POST" action="/approveClubRequest">
-    <label>Club Request ID: <input type="text" name="clubRequestID" required></label>
-    <button type="submit">Approve</button>
-  </form>
+  <div class="container">
+    <h1>Club Creation Requests</h1>
+
+    <% if (requests && requests.length > 0) { %>
+      <% requests.forEach(request => { %>
+        <div class="request-card">
+          <strong>Club:</strong> <%= request.clubName %><br>
+          <strong>Declaration:</strong> <%= request.clubDeclaration %><br>
+          <strong>Requested By:</strong> <%= request.studentName %> (<%= request.studentEmail %>)<br>
+          <strong>Reason:</strong> <%= request.reasonToCreate %><br>
+
+          <div class="request-actions">
+            <form method="POST" action="/approve-create-request/<%= request.createRequestID %>" style="display:inline;">
+              <button type="submit" class="btn-approve">✅ Approve</button>
+            </form>
+            <form method="POST" action="/deny-create-request/<%= request.createRequestID %>" style="display:inline;">
+              <button type="submit" class="btn-deny">❌ Deny</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No club creation requests at the moment.</p>
+    <% } %>
+
+    <a class="btn-secondary" href="/manage">← Back to Admin Dashboard</a>
+  </div>
 </body>
 </html>

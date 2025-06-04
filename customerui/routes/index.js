@@ -178,9 +178,24 @@ router.get('/manage', async (req, res) => {
 });
 
 // ROUTES (in index.js or admin.js router)
-router.get('/approveClubRequest', (req, res) => {
-  res.render('approveClubRequest');
+router.get('/approveClubRequest', async (req, res) => {
+  try {
+    const response = await axios.get('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/create-requests', {
+      headers: {
+        Authorization: `Bearer ${req.cookies.token}`
+      }
+    });
+
+    // The API returns an array, not { requests: [...] }
+    const requestArray = response.data;
+
+    res.render('approveClubRequest', { requests: requestArray }); // ✅ correctly named `requests`
+  } catch (err) {
+    console.error('Error fetching create requests:', err.message);
+    res.render('approveClubRequest', { requests: [] }); // provide empty fallback
+  }
 });
+
 
 router.get('/addMember', (req, res) => {
   res.render('addMember');
@@ -194,11 +209,55 @@ router.get('/addEvent', (req, res) => {
   res.render('addEvent');
 });
 
-// Admin POST routes
-router.post('/approveClubRequest', authorizeRoles(['admin', 'advisor']), async (req, res) => {
-  // Accept club logic here
-  res.send('Club request accepted (mock response).');
+router.post('/approve-create-request/:id', authorizeRoles(['admin', 'advisor']), async (req, res) => {
+  const createRequestID = req.params.id;
+  const token = req.cookies.token;
+
+  try {
+    // Step 1: Fetch the creation request from the ClubManager API
+    const getResponse = await axios.get(`http://clubmanagerapi:8080/api/ClubManager/create-requests`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const requests = getResponse.data;
+    const request = requests.find(r => r.createRequestID === createRequestID);
+
+    if (!request) {
+      return res.status(404).send("Create request not found.");
+    }
+
+    // Step 2: Look up president and advisor IDs
+    const { presidentID, presidentName, advisorID } = await getClubUserDetails(
+      request.studentEmail,   // president
+      'AdvisorLana@Advisor.com' // hardcoded or dynamically chosen advisor
+    );
+
+    // Step 3: Construct the club object
+    const club = {
+      clubName: request.clubName,
+      clubDeclaration: request.clubDeclaration,
+      presidentName,
+      presidentID,
+      advisorID
+    };
+
+    // Step 4: Send POST request to Spring Boot API to create the club
+    await axios.post('http://clubserviceapi:8080/api/clubs', club, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    // Step 5: Delete the request from the original list
+    await axios.post(`http://clubmanagerapi:8080/api/ClubManager/create-request/${createRequestID}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    res.redirect('/approveClubRequest');
+  } catch (err) {
+    console.error('Error approving club request:', err.message);
+    res.status(500).send("Failed to approve request.");
+  }
 });
+
 
 router.post('/addMember', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   // Add user to club logic here
@@ -304,14 +363,15 @@ async function getClubUserDetails(presidentEmail, advisorEmail) {
 
 
 router.get('/create-club', (req, res) => {
-  res.render('createclub');
+  res.render('createclub', { success: false, clubName: null, error: null });
 });
+
 
 router.post('/create-club', async (req, res) => {
   const { clubName, clubDeclaration, studentName, studentEmail, reasonToCreate } = req.body;
 
   try {
-    const response = await axios.post('http://PRO290ClubManagerAPI:8080/api/ClubManager/create-request', {
+    const response = await axios.post('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/create-request', {
       clubName,
       clubDeclaration,
       studentName,
@@ -376,7 +436,7 @@ router.post('/join-club', async (req, res) => {
   const { clubID, studentName, studentEmail, reasonToJoin } = req.body;
 
   try {
-    const response = await axios.post('http://PRO290ClubManagerAPI:8080/api/ClubManager/join-request', {
+    const response = await axios.post('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/join-request', {
       clubID,
       studentName,
       studentEmail,
