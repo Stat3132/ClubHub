@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClubManagementServer.Models
 {
@@ -11,5 +12,8 @@ namespace ClubManagementServer.Models
         public required string StudentEmail { get; set; }
         public required string ReasonToCreate { get; set; }
         public required DateTime RequestDate { get; set; }
+
+        [NotMapped]
+        public required string AdvisorEmail { get; set; }
     }
 }
