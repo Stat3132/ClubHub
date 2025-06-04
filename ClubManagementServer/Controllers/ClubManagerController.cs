@@ -168,7 +168,7 @@ public class ClubManagerController : ControllerBase
     // Accept Create Request
     [HttpPost("accept-create-request/{id}")]
     [Authorize]
-    public IActionResult AcceptCreateRequest(Guid id)
+    public IActionResult AcceptCreateRequest(Guid id, [FromQuery] string advisorEmail)
     {
         var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
         if (role != "Advisor" && role != "Admin")
@@ -178,6 +178,33 @@ public class ClubManagerController : ControllerBase
         if (request == null)
             return NotFound(new { Success = false, Message = "Create request not found." });
 
+        // Look up president by email
+        var president = _dbContext.user.FirstOrDefault(u => u.email == request.StudentEmail);
+        if (president == null)
+        {
+            // Optionally, create the user if not found
+            president = new User
+            {
+                userID = Guid.NewGuid(),
+                firstName = request.StudentName.Split(' ')[0],
+                lastName = request.StudentName.Contains(" ") ? request.StudentName.Substring(request.StudentName.IndexOf(" ") + 1) : "",
+                email = request.StudentEmail,
+                phoneNumber = "", // Set as needed
+                password = new byte[0], // Set as needed
+                role = Role.President
+            };
+            _dbContext.user.Add(president);
+            _dbContext.SaveChanges();
+        }
+
+        // Example: Assume advisorEmail is passed in the ClubCreateRequest
+        Console.WriteLine("Advisor Email: " + advisorEmail);
+        var advisor = _dbContext.user.FirstOrDefault(u => u.email == advisorEmail);
+        if (advisor == null)
+        {
+            return BadRequest(new { Success = false, Message = "Advisor not found." });
+        }
+
         // Create the club
         var club = new Club
         {
@@ -185,8 +212,8 @@ public class ClubManagerController : ControllerBase
             clubName = request.ClubName,
             clubDeclaration = request.ClubDeclaration,
             presidentName = request.StudentName,
-            presidentID = Guid.NewGuid(), // You may want to look up or create the user and use their ID
-            advisorID = Guid.NewGuid()    // Set appropriately
+            presidentID = president.userID, // You may want to look up or create the user and use their ID
+            advisorID = advisor.userID    // Set appropriately
         };
         _dbContext.club.Add(club);
 
