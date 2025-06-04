@@ -2,13 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const crypto = require('crypto'); 
 const router = express.Router();
-
-
-
-// login page
-router.get('/', (req, res) => {
-  res.render('login');
-});
+const authorizeRoles = require('../middleware/authorizeRoles');
 
 // signup page
 router.get('/signup', (req, res) => {
@@ -41,11 +35,19 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+// login page
+router.get('/', (req, res) => {
+  res.render('login');
+});
+
+const jwt = require('jsonwebtoken');
+const sql = require('mssql');
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Step 1: Authenticate with UserService
+    // Step 1: Authenticate with UserService and get JWT
     const response = await axios.post('http://PRO290UserServiceAPI:8080/api/users/login', {
       Email: email,
       Password: password
@@ -57,44 +59,53 @@ router.post('/login', async (req, res) => {
       return res.render('login', { error: data.message || 'Invalid login.' });
     }
 
-    // Step 2: Get user role and ID
-    const pool = await sql.connect(sqlConfig);
-    const result = await pool.request()
-      .input('email', sql.VarChar, email.toLowerCase())
-      .query(`SELECT role, userID FROM [user] WHERE LOWER(email) = @email`);
+    // Step 2: Store the JWT token in a secure cookie
+    res.cookie('token', data.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 1000 // 1 hour
+    });
 
-    if (result.recordset.length === 0) {
-      return res.render('login', { error: 'User not found in system.' });
+    // Step 3: Decode token to get the role and userID
+    const decoded = jwt.decode(data.token);
+    console.log('Decoded JWT:', decoded);
+
+    const role = decoded?.role?.toLowerCase()
+               || decoded?.Role?.toLowerCase()
+               || decoded?.['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']?.toLowerCase();
+
+    const userID = decoded?.sub;
+
+    if (!role) {
+      console.warn('⚠️ Role claim not found in decoded JWT:', decoded);
+      return res.status(403).render('login', { error: 'Access denied: no role found in token.' });
     }
-
-    const role = result.recordset[0].role.toLowerCase();
-    const userID = result.recordset[0].userID;
 
     console.log(`✅ ${email} logged in as ${role}`);
 
-    // Step 3: Role-based redirect
+    // Step 4: Role-based redirect logic
     if (role === 'admin') {
-      return res.redirect('/manage'); // Admin sees all users
+      return res.redirect('/manage');
     }
 
     if (role === 'advisor') {
-      const clubResult = await pool.request()
+      const pool = await sql.connect(sqlConfig);
+      const result = await pool.request()
         .input('userID', sql.UniqueIdentifier, userID)
         .query(`
           SELECT TOP 1 clubID FROM club
           WHERE advisorID = @userID
         `);
 
-      if (clubResult.recordset.length > 0) {
-        const clubID = clubResult.recordset[0].clubID;
+      if (result.recordset.length > 0) {
+        const clubID = result.recordset[0].clubID;
         return res.redirect(`/manage/${clubID}`);
       }
 
-      // If no club found
-      return res.redirect('/home');
+      return res.redirect('/home'); // fallback if advisor has no club
     }
 
-    // Students/presidents/others
+    // Default redirect for other roles (e.g. student, president, etc.)
     return res.redirect('/home');
 
   } catch (err) {
@@ -102,6 +113,9 @@ router.post('/login', async (req, res) => {
     return res.status(401).render('login', { error: 'Login failed. Check your credentials.' });
   }
 });
+
+
+
 
 router.get('/home', async (req, res) => {
   try {
@@ -191,22 +205,22 @@ router.get('/addEvent', (req, res) => {
 });
 
 // Admin POST routes
-router.post('/approveClubRequest', async (req, res) => {
+router.post('/approveClubRequest', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   // Accept club logic here
   res.send('Club request accepted (mock response).');
 });
 
-router.post('/addMember', async (req, res) => {
+router.post('/addMember', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   // Add user to club logic here
   res.send('User added to club (mock response).');
 });
 
-router.post('/removeMember', async (req, res) => {
+router.post('/removeMember', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   // Remove user from club logic here
   res.send('User removed from club (mock response).');
 });
 
-router.post('/addEvent', async (req, res) => {
+router.post('/addEvent', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   // Add event to club logic here
   res.send('Event added (mock response).');
 });
@@ -215,8 +229,6 @@ router.post('/addEvent', async (req, res) => {
 
 // END OF ADMIN ROUTES /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-const sql = require('mssql');
 
 const sqlConfig = {
   user: 'sa',

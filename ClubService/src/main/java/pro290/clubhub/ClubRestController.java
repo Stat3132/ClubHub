@@ -31,10 +31,11 @@ public class ClubRestController {
         return "hello";
     }
 
-    @GetMapping(path="")
+    @GetMapping(path = "")
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADVISOR', 'ADMIN')")
     @ResponseStatus(code = HttpStatus.OK)
     public List<Club> findAllClubs() {
-        return clubsRepo.findAll();
+    return clubsRepo.findAll();
     }
 
     @GetMapping(path = "/{clubUUID}")

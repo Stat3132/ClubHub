@@ -6,6 +6,9 @@ const routes = require('./routes/index');
 // Serve static files from /public
 app.use(express.static(path.join(__dirname, 'public')));
 
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
