@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Request to Join Club</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="form-container">
+    <h1>Request to Join a Club</h1>
+    <form method="POST" action="/join-club">
+      <label>Club ID: <input type="text" name="clubID" required></label><br>
+      <label>Your Name: <input type="text" name="studentName" required></label><br>
+      <label>Your Email: <input type="email" name="studentEmail" required></label><br>
+      <label>Reason to Join: <textarea name="reasonToJoin" required></textarea></label><br>
+      <button type="submit">Submit Request</button>
+    </form>
+
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="success-message">
+        ✅ Join request submitted successfully!
+      </div>
+    <% } %>
+
+    <% if (typeof error !== 'undefined') { %>
+      <div class="error-message">
+        ❌ <%= error %>
+      </div>
+    <% } %>
+
+    <a class="btn-secondary" href="/home">← Back to Home</a>
+  </div>
+</body>
+</html>
