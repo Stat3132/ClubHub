@@ -11,4 +11,4 @@ WORKDIR /app4
 
 COPY --from=build-env /app3/outBuildFolder/ .
 
-ENTRYPOINT ["dotnet", "MessageService.dll"]
+ENTRYPOINT ["dotnet", "ClubManagementService.dll"]

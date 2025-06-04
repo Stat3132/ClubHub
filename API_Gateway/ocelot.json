@@ -77,9 +77,9 @@
       }
     },
     {
-      "ServiceName": "PRO290ClubManagementServiceAPI",
+      "ServiceName": "PRO290ClubManagementService",
       "DownstreamPathTemplate": "/{everything}",
-      "UpstreamPathTemplate": "/messageserviceapi/{everything}",
+      "UpstreamPathTemplate": "/clubmanageserviceapi/{everything}",
       "UpstreamHttpMethod": [
         "GET",
         "POST",

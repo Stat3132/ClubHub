@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MessageService;
+using ClubManagementServer;
 
-namespace MessageService.Models
+namespace ClubManagementServer.Models
 {
     public class ClubHubDBContext : DbContext
     {

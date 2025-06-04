@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "trx8gIemMJ/E2/qpF/fTa+2dS/kjBJgRLscTGuo/dKE=",
+  "Source": "ClubManagementService",
+  "BasePath": "_content/ClubManagementService",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

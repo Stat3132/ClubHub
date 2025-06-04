@@ -141,6 +141,18 @@ services:
       - kittycatsuperfun
   
   #TODO: add Club Management Service
+  PRO290ClubManagementServiceAPI:
+    container_name: PRO290ClubManagementServiceAPI
+    build:
+      context: ./ClubManagementServer
+      dockerfile: Dockerfile
+    image: pro290clubmanagementserviceapi:1
+    restart: always
+    hostname: PRO290ClubManagementServiceAPI
+    ports:
+      - "8088:8080"
+    networks:
+      - kittycatsuperfun
 
 
 volumes:

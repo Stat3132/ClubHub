@@ -1,4 +1,4 @@
-namespace MessageService.Models
+namespace ClubManagementServer.Models
 {
     public enum Role
     {

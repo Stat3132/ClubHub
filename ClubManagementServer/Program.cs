@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using MessageService.Models;
+using ClubManagementServer.Models;
 
 // eureka
 using Steeltoe.Discovery.Client;
@@ -53,9 +53,6 @@ builder.Services.AddAuthorization();
 // Eureka Discovery (if used)
 builder.Services.AddDiscoveryClient(builder.Configuration);
 
-// RabbitMQ
-builder.Services.AddScoped<IOrderNotificationProducer, OrderNotificationProducer>();
-builder.Services.AddHostedService<OrderNotificationConsumer>();
 
 var app = builder.Build();
 
@@ -73,7 +70,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Optional test route
-app.MapGet("/security/getMessage", () => "Hello World!").RequireAuthorization();
+//app.MapGet("/security/getMessage", () => "Hello World!").RequireAuthorization();
 
 // Required if Eureka is enabled. call is now obsolete, unnecessary
 //app.UseDiscoveryClient(); 
