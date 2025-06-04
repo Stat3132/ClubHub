@@ -34,10 +34,17 @@
     </form>
 
     <% if (typeof success !== 'undefined' && success) { %>
-      <div class="success-message">
-        ✅ Request for '<%= clubName %>' submitted successfully!
-      </div>
-    <% } %>
+  <div class="success-message">
+    ✅ Request for '<%= clubName || "Unnamed Club" %>' submitted successfully!
+  </div>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="error-message">
+    ❌ <%= error %>
+  </div>
+<% } %>
+
 
     <a class="btn-secondary" href="/home">← Back to Home</a>
   </div>
