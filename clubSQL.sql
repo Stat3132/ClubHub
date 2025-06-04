@@ -40,4 +40,30 @@ CREATE TABLE userclub (
     FOREIGN KEY (userID) REFERENCES [user](userID),
     FOREIGN KEY (clubID) REFERENCES club(clubID)
 );
+
+-- Table to store requests to join a club
+CREATE TABLE club_join_request (
+    joinRequestID UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    clubID UNIQUEIDENTIFIER NOT NULL,
+    studentName VARCHAR(60) NOT NULL,
+    studentEmail VARCHAR(255) NOT NULL,
+    reasonToJoin TEXT NOT NULL,
+    requestDate DATETIME NOT NULL DEFAULT GETDATE(),
+    PRIMARY KEY(joinRequestID),
+    FOREIGN KEY (clubID) REFERENCES club(clubID)
+);
 GO
+
+-- Table to store requests to create a new club
+CREATE TABLE club_create_request (
+    createRequestID UNIQUEIDENTIFIER NOT NULL DEFAULT NEWID(),
+    clubName VARCHAR(50) NOT NULL,
+    clubDeclaration TEXT NOT NULL,
+    studentName VARCHAR(60) NOT NULL,
+    studentEmail VARCHAR(255) NOT NULL,
+    reasonToCreate TEXT NOT NULL,
+    requestDate DATETIME NOT NULL DEFAULT GETDATE(),
+    PRIMARY KEY(createRequestID)
+);
+GO
+

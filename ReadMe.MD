@@ -17,4 +17,3 @@ Incomplete Microservices
 - Club Management Service (Hard)
     - only allow advisor+ to get/delete
 - Customer UI (React) (Diego) (Medium)
-- Update Current services to check authentication of user (Will have sub-points if it needs updating)
