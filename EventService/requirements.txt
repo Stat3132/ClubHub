@@ -3,3 +3,7 @@ uvicorn
 pymongo
 python-dotenv
 py-eureka-client
+fastapi
+python-jose
+python-multipart
+passlib[bcrypt]

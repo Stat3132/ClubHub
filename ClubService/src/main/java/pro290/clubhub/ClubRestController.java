@@ -47,7 +47,6 @@ public class ClubRestController {
         return new String();
     }
 
-    //TODO: Fix this part to get authorization working (spring-boot-starter-oauth2-jose)
 
     @PostMapping(path="")
     @ResponseStatus(code = HttpStatus.CREATED)
@@ -59,6 +58,7 @@ public class ClubRestController {
     }
 
     @PostMapping(path = "/addclubs")  
+    @PreAuthorize("hasAnyRole('ADVISOR', 'ADMIN')")
     public void createMultipleFoods(@RequestBody List<Club> clubs) {
 
         for (Club club : clubs) {
@@ -77,6 +77,7 @@ public class ClubRestController {
 
     @PutMapping(path = "/{clubUUID}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAnyRole('ADVISOR', 'ADMIN')")
     public void updateFood(@PathVariable(required = true) UUID clubUUID, @RequestBody Club club) {
 
         if (!club.getClubID().equals(clubUUID)) {
@@ -88,6 +89,7 @@ public class ClubRestController {
 
     @DeleteMapping(path = "/{clubUUID}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADVISOR', 'ADMIN')")
     public void DeleteItem(@PathVariable(required = true) UUID clubUUID) {
         clubsRepo.deleteById(clubUUID);
     }

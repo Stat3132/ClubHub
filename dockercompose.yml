@@ -18,6 +18,8 @@ services:
     environment:
       SA_PASSWORD: "abc12345!"
       ACCEPT_EULA: "Y"
+
+  #Service for CRUD on users
   PRO290UserServiceAPI:
     container_name: PRO290UserServiceAPI
     build:
@@ -31,7 +33,7 @@ services:
     networks:
       - kittycatsuperfun
 
-
+  #Service for CRUD on clubs
   PRO290ClubServiceAPI:
     container_name: PRO290ClubServiceAPI
     build:
@@ -45,6 +47,7 @@ services:
     networks:
       - kittycatsuperfun
 
+  #Service Discovery
   PRO290EurekaRegistry:
     container_name: PRO290EurekaRegistry
     image: steeltoeoss/eureka-server:latest
@@ -55,6 +58,7 @@ services:
     networks:
       - kittycatsuperfun 
 
+  #API Gateway
   PRO290OcelotAPIGateway:
     container_name: PRO290OcelotAPIGateway
     build:
@@ -68,6 +72,7 @@ services:
     networks:
       - kittycatsuperfun
   
+  #Message Queue
   PRO290MessageServiceQueueRabbitMQ:
     container_name: PRO290MessageServiceQueueRabbitMQ
     image: rabbitmq:3-management
@@ -79,6 +84,7 @@ services:
     networks:
       - kittycatsuperfun
 
+  #Service to queue and send messages (consumer/producer)
   PRO290MessageServiceAPI:
     container_name: PRO290MessageServiceAPI
     build:
@@ -91,9 +97,8 @@ services:
       - "8086:8080"
     networks:
       - kittycatsuperfun
-
   
-  # database for Food serice
+  # database for Event serice
   PRO290EventServiceDBMongo:
     container_name: PRO290EventServiceDBMongo
     image: mongo:latest
@@ -104,6 +109,7 @@ services:
     networks:
       - kittycatsuperfun
 
+  #Service for CRUD on events
   PRO290EventServiceAPI:
     container_name: PRO290EventServiceAPI
     build:
@@ -119,6 +125,7 @@ services:
     environment:
       - MONGO_URL=mongodb://PRO290EventServiceDBMongo:27017
 
+  #The User Interface for our program
   PRO290CustomerUI:
     container_name: PRO290CustomerUI
     build:
@@ -132,6 +139,8 @@ services:
       - ./customerui:/app 
     networks:
       - kittycatsuperfun
+  
+  #TODO: add Club Management Service
 
 
 volumes:
