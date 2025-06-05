@@ -19,6 +19,7 @@ Incomplete Microservices
 - Customer UI (NODE) (Diego) (Hard)
 
 NEEDED FOR UI:
+- Remove USER -
 - Create events - 
 - Show events - 
 

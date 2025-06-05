@@ -402,6 +402,7 @@ router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, re
   let { userID, userName } = req.body;
 
   if (!userID || typeof userID !== 'string') {
+    console.log(`error ${userID}, ${userName}`)
     return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
   }
 
@@ -414,8 +415,13 @@ router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, re
 
   const token = req.cookies.token;
 
+  // Print the token for debugging
+  console.log('JWT token:', token);
+  console.log(`UserID ${userID} \n username: ${userName}`)
+  console.log(JSON.stringify(req.body, null, 2))
+
   try {
-    const response = await axios.delete(`http://PRO290UserServiceAPI:8080/api/users/${userID}`, {
+    const response = await axios.delete(`http://PRO290OcelotAPIGateway:8080/userserviceapi/api/users/${userID}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
