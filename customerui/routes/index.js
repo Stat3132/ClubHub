@@ -428,7 +428,9 @@ router.post('/removeMember', authorizeRoles(['admin', 'advisor']), async (req, r
   }
 });
 
-
+router.get('/addEvent', (req, res) => {
+  res.render('addEvent');
+});
 
 router.post('/addEvent', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   // Parse form data from req.body
