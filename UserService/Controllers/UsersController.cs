@@ -190,6 +190,7 @@ public class UsersController : ControllerBase
             new Claim(JwtRegisteredClaimNames.Email, user.email),
             new Claim("name", $"{user.firstName} {user.lastName}"),
             new Claim(ClaimTypes.Role, user.role.ToString())
+            
         };
 
 

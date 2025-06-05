@@ -170,8 +170,8 @@ public class ClubManagerController : ControllerBase
     [Authorize]
     public IActionResult AcceptCreateRequest(Guid id, [FromQuery] string advisorEmail)
     {
-        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-        if (role != "Advisor" && role != "Admin")
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value?.ToLower();
+        if (role != "advisor" && role != "admin")
             return StatusCode(403, new { Success = false, Message = "Only advisors and admins can accept create requests." });
 
         var request = _dbContext.club_create_request.Find(id);

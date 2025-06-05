@@ -17,3 +17,12 @@ Incomplete Microservices
 - Club Management Service (Hard)
     - only allow advisor+ to get/delete
 - Customer UI (React) (Diego) (Medium)
+
+NEEDED FOR UI:
+- Remove USER -
+- Create events - 
+- Show events - 
+- ACCEPT/DENY Club join requests - 
+- Remove USER from CLUB - 
+
+
