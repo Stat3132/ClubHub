@@ -185,14 +185,35 @@ router.post('/create-club', authorizeRoles(['admin', 'advisor', 'student']), asy
 });
 
 //JOIN CLUB
-router.get('/join-club', (req, res) => {
-  res.render('join-club');
+router.get('/join-club', async (req, res) => {
+  try {
+    const pool = await sql.connect(sqlConfig);
+    const result = await pool.request().query('SELECT clubName FROM club');
+    const clubs = result.recordset;
+
+    res.render('join-club', { clubs });
+  } catch (err) {
+    console.error('Error loading join club form:', err.message);
+    res.render('join-club', { clubs: [], error: 'Failed to load club list' });
+  }
 });
 
+
 router.post('/join-club', authorizeRoles(['admin', 'advisor', 'student']), async (req, res) => {
-  const { clubID, studentName, studentEmail, reasonToJoin } = req.body;
+  const { clubName, studentName, studentEmail, reasonToJoin } = req.body;
 
   try {
+    const pool = await sql.connect(sqlConfig);
+    const result = await pool.request()
+      .input('clubName', sql.VarChar, clubName)
+      .query('SELECT clubID FROM club WHERE clubName = @clubName');
+
+    if (result.recordset.length === 0) {
+      return res.render('join-club', { success: false, error: 'Club not found', clubs: [] });
+    }
+
+    const clubID = result.recordset[0].clubID;
+
     const response = await axios.post('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/join-request', {
       clubID,
       studentName,
@@ -201,17 +222,16 @@ router.post('/join-club', authorizeRoles(['admin', 'advisor', 'student']), async
     });
 
     if (response.status === 200 && response.data.success) {
-      return res.render('join-club', { success: true });
+      return res.render('join-club', { success: true, clubs: [] });
     } else {
-      return res.render('join-club', { error: response.data.Message || 'Failed to submit join request.' });
+      return res.render('join-club', { error: response.data.Message || 'Failed to submit join request', clubs: [] });
     }
   } catch (err) {
     console.error('Error submitting join request:', err.message);
-    return res.status(500).render('join-club', {
-      error: 'Failed to submit join request. ' + err.message
-    });
+    return res.render('join-club', { error: 'Failed to submit join request. ' + err.message, clubs: [] });
   }
 });
+
 
 
 
@@ -292,13 +312,28 @@ router.get('/approveClubRequest', authorizeRoles(['admin', 'advisor']), async (r
   }
 });
 
+
 router.post('/approve-create-request/:id', async (req, res) => {
   const createRequestID = req.params.id;
   const token = req.cookies.token;
 
   try {
+    // Decode the token (without verifying since it's already trusted at this point)
+    const decoded = jwt.decode(token);
+
+    const email =
+      decoded?.email ||
+      decoded?.Email ||
+      decoded?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'];
+
+    if (!email) {
+      console.error('❌ Email not found in token payload.');
+      return res.redirect('/manage?error=missing_email');
+    }
+
+    // Send the email as the advisor/admin
     const response = await axios.post(
-      `http://PRO290OcelotAPIGateway:8080/clubmanageserviceapi/api/ClubManager/accept-create-request/${createRequestID}?advisorEmail=AdvisorLana@Advisor.com`,
+      `http://PRO290OcelotAPIGateway:8080/clubmanageserviceapi/api/ClubManager/accept-create-request/${createRequestID}?advisorEmail=${encodeURIComponent(email)}`,
       {},
       {
         headers: {
@@ -313,6 +348,7 @@ router.post('/approve-create-request/:id', async (req, res) => {
     res.redirect('/manage?error=true');
   }
 });
+
 
 router.post('/deny-create-request/:id', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   const createRequestID = req.params.id;
@@ -454,18 +490,41 @@ router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, re
 router.get('/approveJoinRequests', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   try {
     const token = req.cookies.token;
-    const response = await axios.get('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/join-requests', {
-      headers: {
-        Authorization: `Bearer ${token}`
+
+    // 1. Fetch join requests from your API
+    const response = await axios.get(
+      'http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/join-requests',
+      {
+        headers: { Authorization: `Bearer ${token}` }
       }
+    );
+    const requests = response.data;
+
+    // 2. Fetch clubID → clubName mapping
+    const pool = await sql.connect(sqlConfig);
+    const clubs = await pool.request().query(`SELECT clubID, clubName FROM club`);
+    const clubMap = {};
+    clubs.recordset.forEach(club => {
+      clubMap[club.clubID.toLowerCase()] = club.clubName;
     });
 
-    res.render('approveJoinRequest', { requests: response.data });
+    // 3. Add clubName to each request
+    const enrichedRequests = requests.map(r => {
+      const cleanClubID = r.clubID?.replace(/[{}]/g, '').trim().toLowerCase();
+      return {
+        ...r,
+        clubName: clubMap[cleanClubID] || 'Unknown Club'
+      };
+    });
+
+    res.render('approveJoinRequest', { requests: enrichedRequests });
+
   } catch (err) {
     console.error('Error fetching join requests:', err.message);
     res.render('approveJoinRequest', { requests: [] });
   }
 });
+
 
 router.post('/approve-join-request/:id', authorizeRoles(['admin', 'advisor']), async (req, res) => {
   const token = req.cookies.token;
