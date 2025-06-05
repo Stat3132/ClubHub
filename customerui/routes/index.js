@@ -280,8 +280,13 @@ router.post('/remove-user', authorizeRoles(['admin']), async (req, res) => {
   const { userID, userName } = req.body;
   const token = req.cookies.token;
 
+  // Print the token for debugging
+  console.log('JWT token:', token);
+  console.log(`UserID ${userID} \n username: ${userName}`)
+  console.log(JSON.stringify(req.body, null, 2))
+
   try {
-    const response = await axios.delete(`http://localhost:8080/userserviceapi/api/users/${userID}`, {
+    const response = await axios.delete(`http://localhost:5041/userserviceapi/api/users/${userID}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

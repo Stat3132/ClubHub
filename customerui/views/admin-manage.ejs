@@ -172,7 +172,7 @@
 
     async function removeUser(userID, userName) {
       if (!confirm(`Are you sure you want to remove ${userName}?`)) return;
-
+      console.log(`UserID ${userID} \n username: ${userName}`)
       try {
         const res = await fetch('/remove-user', {
           method: 'POST',
