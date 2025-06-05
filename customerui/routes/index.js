@@ -4,6 +4,8 @@ const crypto = require('crypto');
 const router = express.Router();
 const authorizeRoles = require('../middleware/authorizeRoles');
 
+//USER FUNCTIONALITY ROUTES/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // signup page
 router.get('/signup', (req, res) => {
   res.render('signup');
@@ -22,7 +24,7 @@ router.post('/signup', async (req, res) => {
       role
     });
 
-    if (response.data.Success) {
+    if (response.data.success) {
       
       return res.redirect('/'); 
     } else {
@@ -59,14 +61,14 @@ router.post('/login', async (req, res) => {
       return res.render('login', { error: data.message || 'Invalid login.' });
     }
 
-    // Step 2: Store the JWT token in a secure cookie
+    // Step 2: Store the JWT token in a cookie
     res.cookie('token', data.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 1000 // 1 hour
     });
 
-    // Step 3: Decode token to get the role and userID
+    // Step 3: Decode token to get the roles and userID
     const decoded = jwt.decode(data.token);
     console.log('Decoded JWT:', decoded);
 
@@ -88,7 +90,7 @@ router.post('/login', async (req, res) => {
       return res.redirect('/manage');
     }
 
-    // Default redirect for other roles (e.g. student, president, etc.)
+    // Default redirect for other roles Students and presidents and what not
     return res.redirect('/home');
 
   } catch (err) {
@@ -101,19 +103,116 @@ router.get('/home', async (req, res) => {
   const token = req.cookies.token;
 
   try {
-    const response = await axios.get('http://PRO290ClubServiceAPI:8080/api/clubs', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const pool = await sql.connect(sqlConfig);
 
-    const clubs = response.data;
+    // Fetch all clubs
+    const clubsResult = await pool.request().query(`
+      SELECT clubID, clubName, clubDeclaration, presidentName FROM club
+    `);
+
+    // Fetch all user-club relationships with user info
+    const membersResult = await pool.request().query(`
+      SELECT uc.clubID, u.firstName, u.lastName, u.email
+      FROM userclub uc
+      JOIN [user] u ON uc.userID = u.userID
+    `);
+
+    const memberMap = {};
+    for (const row of membersResult.recordset) {
+  const cleanedClubID = row.clubID.replace(/[{}]/g, ''); // remove curly braces
+
+  if (!memberMap[cleanedClubID]) {
+    memberMap[cleanedClubID] = [];
+  }
+
+  memberMap[cleanedClubID].push({
+    name: `${row.firstName} ${row.lastName}`,
+    email: row.email
+  });
+}
+
+    // Attach members to each club
+    const clubs = clubsResult.recordset.map(club => {
+  const cleanedID = club.clubID.replace(/[{}]/g, '');
+  return {
+    ...club,
+    members: memberMap[cleanedID] || []
+  };
+});
+
+
     res.render('home', { clubs });
+
   } catch (err) {
-    console.error('Error fetching clubs:', err.response?.data || err.message);
-    res.render('home', { clubs: [] }); 
+    console.error('Error fetching clubs or members:', err.message);
+    res.render('home', { clubs: [] });
   }
 });
+
+//CREATE CLUB
+router.get('/create-club', (req, res) => {
+  res.render('createclub', { success: false, clubName: null, error: null });
+});
+
+
+router.post('/create-club', authorizeRoles(['admin', 'advisor', 'student']), async (req, res) => {
+  const { clubName, clubDeclaration, studentName, studentEmail, reasonToCreate } = req.body;
+
+  try {
+    const response = await axios.post('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/create-request', {
+  ClubName: clubName,
+  ClubDeclaration: clubDeclaration,
+  StudentName: studentName,
+  StudentEmail: studentEmail,
+  ReasonToCreate: reasonToCreate
+});
+
+    if (response.status === 200 && response.data.success) {
+      return res.render('createclub', {
+        success: true,
+        clubName
+      });
+    } else {
+      return res.render('createclub', { error: response.data.Message || 'Failed to submit request.' });
+    }
+
+  } catch (err) {
+    console.error('Error submitting create request:', err.message);
+    return res.status(500).render('createclub', {
+      error: 'Failed to submit club request. ' + err.message
+    });
+  }
+});
+
+//JOIN CLUB
+router.get('/join-club', (req, res) => {
+  res.render('join-club');
+});
+
+router.post('/join-club', authorizeRoles(['admin', 'advisor', 'student']), async (req, res) => {
+  const { clubID, studentName, studentEmail, reasonToJoin } = req.body;
+
+  try {
+    const response = await axios.post('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/join-request', {
+      clubID,
+      studentName,
+      studentEmail,
+      reasonToJoin
+    });
+
+    if (response.status === 200 && response.data.success) {
+      return res.render('join-club', { success: true });
+    } else {
+      return res.render('join-club', { error: response.data.Message || 'Failed to submit join request.' });
+    }
+  } catch (err) {
+    console.error('Error submitting join request:', err.message);
+    return res.status(500).render('join-club', {
+      error: 'Failed to submit join request. ' + err.message
+    });
+  }
+});
+
 
 
 
@@ -193,46 +292,6 @@ router.get('/approveClubRequest', authorizeRoles(['admin', 'advisor']), async (r
   }
 });
 
-router.post('/deny-create-request/:id', authorizeRoles(['admin', 'advisor']), async (req, res) => {
-  const createRequestID = req.params.id;
-  const token = req.cookies.token;
-
-  try {
-    const response = await axios.post(
-      `http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/deny-create-request/${createRequestID}`,
-      {}, // No body needed
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    if (response.data?.Success) {
-      return res.redirect('/approveClubRequest');
-    } else {
-      return res.status(400).send('Failed to deny request: ' + response.data?.Message);
-    }
-  } catch (err) {
-    console.error('❌ Error denying club request:', err.message);
-    return res.status(500).send('Failed to deny request.');
-  }
-});
-
-
-
-router.get('/addMember', (req, res) => {
-  res.render('addMember');
-});
-
-router.get('/removeMember', (req, res) => {
-  res.render('removeMember');
-});
-
-router.get('/addEvent', (req, res) => {
-  res.render('addEvent');
-});
-
 router.post('/approve-create-request/:id', async (req, res) => {
   const createRequestID = req.params.id;
   const token = req.cookies.token;
@@ -255,20 +314,86 @@ router.post('/approve-create-request/:id', async (req, res) => {
   }
 });
 
+router.post('/deny-create-request/:id', authorizeRoles(['admin', 'advisor']), async (req, res) => {
+  const createRequestID = req.params.id;
+  const token = req.cookies.token;
 
-router.post('/addMember', authorizeRoles(['admin', 'advisor']), async (req, res) => {
-  // Add user to club logic here
-  res.send('User added to club (mock response).');
+  try {
+    const response = await axios.post(
+      `http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/deny-create-request/${createRequestID}`,
+      {}, // No body needed
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (response.data?.success) {
+      return res.redirect('/approveClubRequest');
+    } else {
+      return res.status(400).send('Failed to deny request: ' + response.data?.Message);
+    }
+  } catch (err) {
+    console.error('❌ Error denying club request:', err.message);
+    return res.status(500).send('Failed to deny request.');
+  }
 });
+
+
+
+router.get('/removeMember', authorizeRoles(['admin', 'advisor']), async (req, res) => {
+  try {
+    const pool = await sql.connect(sqlConfig);
+    const result = await pool.request().query(`
+      SELECT u.userID, u.firstName, u.lastName, u.email, c.clubID, c.clubName
+      FROM userclub uc
+      JOIN [user] u ON uc.userID = u.userID
+      JOIN club c ON uc.clubID = c.clubID
+    `);
+
+    const members = result.recordset.map(row => ({
+      userID: row.userID,
+      clubID: row.clubID,
+      name: `${row.firstName} ${row.lastName}`,
+      email: row.email,
+      clubName: row.clubName
+    }));
+
+    res.render('removeMember', { members }); // ✅ success path
+  } catch (err) {
+    console.error('Error loading remove member page:', err.message);
+    res.render('removeMember', { members: [] }); // ✅ FIXED: always define `members`
+  }
+});
+
 
 router.post('/removeMember', authorizeRoles(['admin', 'advisor']), async (req, res) => {
-  // Remove user from club logic here
-  res.send('User removed from club (mock response).');
+  const { userID, clubID } = req.body;
+  const token = req.cookies.token;
+
+  try {
+    const response = await axios.delete(
+      `http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/userclub`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { userID, clubID }
+      }
+    );
+
+    if (response.data?.success) {
+      return res.redirect('/removeMember');
+    } else {
+      return res.status(400).send('Failed to remove member: ' + (response.data?.Message || ''));
+    }
+  } catch (err) {
+    console.error('Error removing member:', err.message);
+    return res.status(500).send('Internal server error.');
+  }
 });
 
-router.post('/addEvent', authorizeRoles(['admin', 'advisor']), async (req, res) => {
-  // Add event to club logic here
-  res.send('Event added (mock response).');
+router.get('/addEvent', (req, res) => {
+  res.render('addEvent');
 });
 
 router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, res) => {
@@ -296,7 +421,7 @@ router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, re
       }
     });
 
-    if (response.data?.Success) {
+    if (response.data?.success) {
       return res.json({ success: true, message: `User '${userName}' was removed.` });
     } else {
       return res.status(400).json({
@@ -319,6 +444,57 @@ router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, re
   }
 });
 
+// CLUB Join Requests Route ////////////////////////////////////////////////////////////////////
+router.get('/approveJoinRequests', authorizeRoles(['admin', 'advisor']), async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    const response = await axios.get('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/join-requests', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    res.render('approveJoinRequest', { requests: response.data });
+  } catch (err) {
+    console.error('Error fetching join requests:', err.message);
+    res.render('approveJoinRequest', { requests: [] });
+  }
+});
+
+router.post('/approve-join-request/:id', authorizeRoles(['admin', 'advisor']), async (req, res) => {
+  const token = req.cookies.token;
+  const id = req.params.id;
+
+  try {
+    await axios.post(`http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/accept-join-request/${id}`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    res.redirect('/approveJoinRequests');
+  } catch (err) {
+    console.error('Error approving join request:', err.message);
+    res.redirect('/approveJoinRequests');
+  }
+});
+
+router.post('/deny-join-request/:id', authorizeRoles(['admin', 'advisor']), async (req, res) => {
+  const token = req.cookies.token;
+  const id = req.params.id;
+
+  try {
+    await axios.post(`http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/deny-join-request/${id}`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    res.redirect('/approveJoinRequests');
+  } catch (err) {
+    console.error('Error denying join request:', err.message);
+    res.redirect('/approveJoinRequests');
+  }
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
@@ -326,6 +502,7 @@ router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, re
 // END OF ADMIN ROUTES /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+//
 const sqlConfig = {
   user: 'sa',
   password: 'abc12345!',
@@ -380,62 +557,6 @@ async function getClubUserDetails(presidentEmail, advisorEmail) {
   }
 }
 
-
-router.get('/create-club', (req, res) => {
-  res.render('createclub', { success: false, clubName: null, error: null });
-});
-
-
-router.post('/create-club', authorizeRoles(['admin', 'advisor', 'student']), async (req, res) => {
-  const { clubName, clubDeclaration, studentName, studentEmail, reasonToCreate } = req.body;
-
-  try {
-    const response = await axios.post('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/create-request', {
-  ClubName: clubName,
-  ClubDeclaration: clubDeclaration,
-  StudentName: studentName,
-  StudentEmail: studentEmail,
-  ReasonToCreate: reasonToCreate
-});
-
-    if (response.status === 200 && response.data.Success) {
-      return res.render('createclub', {
-        success: true,
-        clubName
-      });
-    } else {
-      return res.render('createclub', { error: response.data.Message || 'Failed to submit request.' });
-    }
-
-  } catch (err) {
-    console.error('Error submitting create request:', err.message);
-    return res.status(500).render('createclub', {
-      error: 'Failed to submit club request. ' + err.message
-    });
-  }
-});
-
-
-router.get('/contact', (req, res) => {
-  res.render('contact');
-});
-
-router.post('/contact', async (req, res) => {
-  const { senderName, senderEmail, recipientEmail, message } = req.body;
-  try {
-    await axios.post('http://PRO290MessageServiceAPI:8080/api/messages', {
-      senderName,
-      senderEmail,
-      recipientEmail,
-      message
-    });
-    res.redirect('/home');
-  } catch (err) {
-    console.error('Error sending message:', err.message);
-    res.status(500).send('Failed to send message.');
-  }
-});
-
 router.get('/events', async (req, res) => {
   try {
     const response = await axios.get('http://PRO290EventServiceAPI:8000/getevent');
@@ -445,5 +566,11 @@ router.get('/events', async (req, res) => {
     res.render('event', { events: [] });
   }
 });
+
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  return res.redirect('/');
+});
+
 
 module.exports = router;

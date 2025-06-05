@@ -151,10 +151,10 @@
     <div class="admin-panel">
       <h2>Admin Actions</h2>
       <form action="/approveClubRequest" method="GET">
-        <button type="submit">Approve Club Requests</button>
+        <button type="submit">Club creation Requests</button>
       </form>
-      <form action="/addMember" method="GET">
-        <button type="submit">Add Users to Clubs</button>
+      <form action="/approveJoinRequests" method="GET">
+        <button type="submit">Club Join Requests</button>
       </form>
       <form action="/removeMember" method="GET">
         <button type="submit">Remove Users from Clubs</button>
@@ -200,6 +200,33 @@
 }
 
 </script>
+<!-- Floating Logout Button -->
+<form class="logout-button" action="/logout" method="GET">
+  <button type="submit">Logout</button>
+</form>
 
+<style>
+  .logout-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    margin: 0;
+  }
+
+  .logout-button button {
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .logout-button button:hover {
+    opacity: 0.9;
+  }
+</style>
 </body>
 </html>

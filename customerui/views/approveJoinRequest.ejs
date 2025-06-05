@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Approve Join Requests</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      background-color: #e6f3fc;
+      font-family: sans-serif;
+      color: #111;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .request-card {
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      background-color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      border: 1px solid #ccc;
+    }
+
+    .request-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .action-box {
+      display: inline-block;
+      padding: 12px 20px;
+      border-radius: 12px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border: none;
+    }
+
+    .btn-approve {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .btn-deny {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 16px;
+      background-color: #fff;
+      border: 2px solid #007bff;
+      border-radius: 6px;
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      background-color: #e6f0ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Club Join Requests</h1>
+
+    <% if (requests && requests.length > 0) { %>
+      <% requests.forEach(request => { %>
+        <div class="request-card">
+          <strong>Student:</strong> <%= request.studentName %> (<%= request.studentEmail %>)<br>
+          <strong>ClubID:</strong> <%= request.clubID %><br>
+          <strong>Reason:</strong> <%= request.reasonToJoin %><br>
+
+          <div class="request-actions">
+            <form method="POST" action="/approve-join-request/<%= request.joinRequestID %>">
+              <button type="submit" class="action-box btn-approve">✅ Approve</button>
+            </form>
+            <form method="POST" action="/deny-join-request/<%= request.joinRequestID %>">
+              <button type="submit" class="action-box btn-deny">❌ Deny</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No join requests available.</p>
+    <% } %>
+
+    <a class="btn-secondary" href="/manage">← Back to Admin Dashboard</a>
+  </div>
+</body>
+</html>
