@@ -296,13 +296,15 @@ router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, re
   console.log(JSON.stringify(req.body, null, 2))
 
   try {
-    const response = await axios.delete(`http://localhost:5041/userserviceapi/api/users/${userID}`, {
+    const response = await axios.delete(`http://PRO290OcelotAPIGateway:8080/userserviceapi/api/users/${userID}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
 
-    if (response.data?.Success) {
+    console.log('Response body:', JSON.stringify(response.data, null, 2));
+
+    if (response.data?.success) {
       return res.json({ success: true, message: `User '${userName}' was removed.` });
     } else {
       return res.status(400).json({

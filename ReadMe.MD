@@ -19,7 +19,7 @@ Incomplete Microservices
 - Customer UI (React) (Diego) (Medium)
 
 NEEDED FOR UI:
-- Remove USER -
+- Remove USER - Tommy (Done)
 - Create events - 
 - Show events - 
 - ACCEPT/DENY Club join requests - 
