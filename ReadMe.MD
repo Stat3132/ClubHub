@@ -12,15 +12,9 @@ Completed Microservices
 - Email Sender Service (Easy) (Tommy)
     - only allow admin+ to get/post (inclusive to only microservice cross communication) (only need UI)
 - User Authentication (Medium) (Can be added to existing USER microservice)
-
-Incomplete Microservices
 - Club Management Service (Hard)
     - only allow advisor+ to get/delete
 - Customer UI (NODE) (Diego) (Hard)
 
-NEEDED FOR UI:
-- Remove USER -
-- Create events - 
-- Show events - 
-
-
+In Progress
+- Testing

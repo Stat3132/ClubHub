@@ -140,7 +140,7 @@ services:
     networks:
       - kittycatsuperfun
   
-  #TODO: add Club Management Service
+  #Club Management Service
   PRO290ClubManagementServiceAPI:
     container_name: PRO290ClubManagementServiceAPI
     build:

@@ -4,24 +4,82 @@
   <meta charset="UTF-8">
   <title>All Events</title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .event-list {
+      list-style: none;
+      padding: 0;
+      max-width: 600px;
+      margin: 2rem auto;
+    }
+    .event-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      margin-bottom: 1.5rem;
+      padding: 1.5rem 2rem;
+      transition: box-shadow 0.2s;
+    }
+    .event-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+    }
+    .event-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+    }
+    .event-detail {
+      margin-bottom: 0.3rem;
+      color: #555;
+    }
+    .event-coordinator {
+      font-style: italic;
+      color: #0077b6;
+    }
+    .no-events {
+      text-align: center;
+      color: #888;
+      margin-top: 2rem;
+      font-size: 1.1rem;
+    }
+    .btn-secondary {
+      display: inline-block;
+      margin: 2rem auto 0;
+      padding: 0.5rem 1.5rem;
+      background: #0077b6;
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover {
+      background: #023e8a;
+    }
+  </style>
 </head>
 <body>
-  <h1>Upcoming Events</h1>
+  <h1 style="text-align:center; margin-top:2rem;">Upcoming Events</h1>
 
   <% if (events.length > 0) { %>
-    <ul>
+    <ul class="event-list">
       <% events.forEach(event => { %>
-        <li>
-          <strong><%= event.name %></strong> – <%= event.date %> <br>
-          Hosted by: <%= event.hostedBy %><br>
-          <%= event.description %>
+        <li class="event-card">
+          <div class="event-title"><%= event.EventName %></div>
+          <div class="event-detail">Description: <%= event.eventDescription %></div>
+          <div class="event-detail">Budget: <strong>$<%= event.eventBudget %></strong></div>
+          <div class="event-detail event-coordinator">
+            Coordinator: <%= event.eventCoordinator %> (<%= event.eventCoordinatorsNumber %>)
+          </div>
         </li>
       <% }) %>
     </ul>
   <% } else { %>
-    <p>No events found.</p>
+    <div class="no-events">No events found.</div>
   <% } %>
 
-  <a class="btn-secondary" href="/home">← Back to Home</a>
+  <div style="text-align:center;">
+    <a class="btn-secondary" href="/home">← Back to Home</a>
+  </div>
 </body>
 </html>
