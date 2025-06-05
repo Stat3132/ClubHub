@@ -396,8 +396,6 @@ router.post('/create-club', async (req, res) => {
   }
 });
 
-
-
 router.get('/contact', (req, res) => {
   res.render('contact');
 });
@@ -427,34 +425,5 @@ router.get('/events', async (req, res) => {
     res.render('event', { events: [] });
   }
 });
-
-router.get('/join-club', (req, res) => {
-  res.render('join-club');
-});
-
-router.post('/join-club', async (req, res) => {
-  const { clubID, studentName, studentEmail, reasonToJoin } = req.body;
-
-  try {
-    const response = await axios.post('http://PRO290ClubManagementServiceAPI:8080/api/ClubManager/join-request', {
-      clubID,
-      studentName,
-      studentEmail,
-      reasonToJoin
-    });
-
-    if (response.status === 200 && response.data.Success) {
-      return res.render('join-club', { success: true });
-    } else {
-      return res.render('join-club', { error: response.data.Message || 'Failed to submit join request.' });
-    }
-  } catch (err) {
-    console.error('Error submitting join request:', err.message);
-    return res.status(500).render('join-club', {
-      error: 'Failed to submit join request. ' + err.message
-    });
-  }
-});
-
 
 module.exports = router;
