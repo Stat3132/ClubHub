@@ -4,6 +4,86 @@
   <link rel="stylesheet" href="/css/style.css">
   <meta charset="UTF-8">
   <title>Home - ClubHub</title>
+  <style>
+    body {
+      background-color: #e6f3fc;
+      font-family: sans-serif;
+      margin: 0;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+    }
+
+    header nav a {
+      margin-left: 1rem;
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    main {
+      padding: 2rem;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .club-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .club-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid #00c6ff;
+    }
+
+    .club-card h3 {
+      color: #0072ff;
+      margin: 0 0 0.5rem;
+    }
+
+    .club-card ul {
+      padding-left: 1.25rem;
+    }
+
+    .club-card li {
+      margin-bottom: 0.3rem;
+    }
+
+    .logout-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+    }
+
+    .logout-button button {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .logout-button button:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -12,23 +92,36 @@
       <a href="/create-club">Create club declaration</a>
       <a href="/join-club">Request to join club</a>
       <a href="/events">View All Events</a>
-      <a href="/contact">Contact President/Teacher</a>
     </nav>
   </header>
+
   <main>
     <h2>Available Clubs</h2>
     <div class="club-list">
-  <% clubs.forEach(function(club) { %>
-  <div class="club-card">
-    <h3><%= club.clubName %></h3>
-    <p><strong>President:</strong> <%= club.clubPresidentName %></p>
-    <p><strong>Club Declaration:</strong> <%= club.clubDeclaration %></p>
-  </div>
-<% }); %>
+      <% clubs.forEach(function(club) { %>
+        <div class="club-card">
+          <h3><%= club.clubName %></h3>
+          <p><strong>President:</strong> <%= club.presidentName %></p>
+          <p><strong>Club Declaration:</strong> <%= club.clubDeclaration %></p>
 
-</div>
-
+          <% if (club.members && club.members.length > 0) { %>
+            <p><strong>Members:</strong></p>
+            <ul>
+              <% club.members.forEach(member => { %>
+                <li><%= member.name %> - <%= member.email %></li>
+              <% }) %>
+            </ul>
+          <% } else { %>
+            <p><em>No members in this club yet.</em></p>
+          <% } %>
+        </div>
+      <% }); %>
     </div>
   </main>
+
+  <!-- Floating Logout Button -->
+  <form class="logout-button" action="/logout" method="GET">
+    <button type="submit">Logout</button>
+  </form>
 </body>
 </html>

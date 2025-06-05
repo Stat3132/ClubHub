@@ -1,15 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Remove Member</title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #e6f3fc;
+      margin: 0;
+      padding: 0 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 2rem;
+      color: #1a1a1a;
+    }
+
+    .table-container {
+      max-width: 960px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f5f9fc;
+      color: #333;
+      font-weight: bold;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    button {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+    }
+
+    .no-members {
+      text-align: center;
+      color: #777;
+      font-style: italic;
+      padding: 2rem;
+    }
+  </style>
 </head>
 <body>
   <h1>Remove Member from Club</h1>
-  <form method="POST" action="/removeMember">
-    <label>User ID: <input type="text" name="userID" required></label><br>
-    <label>Club ID: <input type="text" name="clubID" required></label><br>
-    <button type="submit">Remove Member</button>
-  </form>
+
+  <div class="table-container">
+    <% if (!members || members.length === 0) { %>
+      <div class="no-members">No users are currently assigned to clubs.</div>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Club</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% members.forEach(member => { %>
+            <tr>
+              <td><%= member.name %></td>
+              <td><%= member.email %></td>
+              <td><%= member.clubName %></td>
+              <td>
+                <form method="POST" action="/removeMember" style="margin: 0;">
+                  <input type="hidden" name="userID" value="<%= member.userID %>">
+                  <input type="hidden" name="clubID" value="<%= member.clubID %>">
+                  <button type="submit">Remove</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
 </body>
 </html>
