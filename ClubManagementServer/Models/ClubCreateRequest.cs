@@ -14,6 +14,6 @@ namespace ClubManagementServer.Models
         public required DateTime RequestDate { get; set; }
 
         [NotMapped]
-        public required string AdvisorEmail { get; set; }
+        public string? AdvisorEmail { get; set; }
     }
 }
