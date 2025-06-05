@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Admin - User Management</title>
@@ -33,7 +34,8 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
-    h1, h2 {
+    h1,
+    h2 {
       color: #003366;
       margin-bottom: 20px;
     }
@@ -99,51 +101,50 @@
     }
   </style>
 </head>
+
 <body>
   <div class="layout">
     <!-- User List -->
     <div class="user-section">
       <h1>Admin - All Users</h1>
-      <input
-        id="searchInput"
-        type="text"
-        class="search-input"
-        placeholder="Search users by name, email, or club..."
-        oninput="filterUsers()"
-      />
+      <input id="searchInput" type="text" class="search-input" placeholder="Search users by name, email, or club..."
+        oninput="filterUsers()" />
 
       <ul class="user-list">
-  <% users.forEach(user => { %>
-    <li class="user-item">
-      <div class="user-info">
-        <strong><%= user.firstName %> <%= user.lastName %></strong><br>
-        Email: <%= user.email %><br>
-        Role: <%= user.role %><br>
+        <% users.forEach(user=> { %>
+          <li class="user-item">
+            <div class="user-info">
+              <strong>
+                <%= user.firstName %>
+                  <%= user.lastName %>
+              </strong><br>
+              Email: <%= user.email %><br>
+                Role: <%= user.role %><br>
 
-        <% if (user.clubs && user.clubs.length > 0) { %>
-          Clubs:
-          <ul>
-            <% user.clubs.forEach(club => { %>
-              <li><%= club.clubName %></li>
-            <% }) %>
-          </ul>
-        <% } else { %>
-          <em>No club assigned</em>
-        <% } %>
-      </div>
+                  <% if (user.clubs && user.clubs.length> 0) { %>
+                    Clubs:
+                    <ul>
+                      <% user.clubs.forEach(club=> { %>
+                        <li>
+                          <%= club.clubName %>
+                        </li>
+                        <% }) %>
+                    </ul>
+                    <% } else { %>
+                      <em>No club assigned</em>
+                      <% } %>
+            </div>
 
-    <% const cleanID = user.userID.toString().replace(/[{}]/g, '').trim(); %>
-<button
-  class="remove-btn"
-  onclick="removeUser('<%= cleanID %>', '<%= user.firstName %> <%= user.lastName %>')"
->
-  Remove
-</button>
+            <% const cleanID=user.userID.toString().replace(/[{}]/g, '' ).trim(); %>
+              <button class="remove-btn"
+                onclick="removeUser('<%= cleanID %>', '<%= user.firstName %> <%= user.lastName %>')">
+                Remove
+              </button>
 
 
-    </li>
-  <% }) %>
-</ul>
+          </li>
+          <% }) %>
+      </ul>
 
     </div>
 
@@ -166,41 +167,42 @@
   </div>
 
   <script>
-  function filterUsers() {
-    const input = document.getElementById('searchInput').value.toLowerCase();
-    const items = document.querySelectorAll('.user-item');
-    items.forEach(item => {
-      const content = item.textContent.toLowerCase();
-      item.style.display = content.includes(input) ? 'flex' : 'none';
-    });
-  }
+    function filterUsers() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const items = document.querySelectorAll('.user-item');
+      items.forEach(item => {
+        const content = item.textContent.toLowerCase();
+        item.style.display = content.includes(input) ? 'flex' : 'none';
+      });
+    }
 
-  async function removeUser(userID, userName) {
-  console.log("🔎 Trying to remove user:", userID, userName);
+    async function removeUser(userID, userName) {
+      console.log("🔎 Trying to remove user:", userID, userName);
 
-  if (!userID || typeof userID !== 'string') {
-    alert('❌ Invalid or missing user ID.');
-    return;
-  }
-  console.log(`UserID ${userID} \n username: ${userName}`)
+      if (!userID || typeof userID !== 'string') {
+        alert('❌ Invalid or missing user ID.');
+        return;
+      }
+      console.log(`UserID ${userID} \n username: ${userName}`)
 
-  try {
-    const res = await fetch('/remove-user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userID, userName })
-    });
+      try {
+        const res = await fetch('/remove-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userID, userName })
+        });
 
-    const result = await res.json();
-    alert(result.message);
-    if (result.success) location.reload();
-  } catch (err) {
-    console.error("❌ Error removing user:", err);
-    alert(`❌ Failed to remove ${userName}.`);
-  }
-}
+        const result = await res.json();
+        alert(result.message);
+        if (result.success) location.reload();
+      } catch (err) {
+        console.error("❌ Error removing user:", err);
+        alert(`❌ Failed to remove ${userName}.`);
+      }
+    }
 
-</script>
+  </script>
 
 </body>
+
 </html>

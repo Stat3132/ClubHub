@@ -277,6 +277,7 @@ router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, re
   let { userID, userName } = req.body;
 
   if (!userID || typeof userID !== 'string') {
+    console.log(`error ${userID}, ${userName}`)
     return res.status(400).json({ success: false, message: 'Invalid or missing user ID.' });
   }
 
