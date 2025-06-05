@@ -240,4 +240,22 @@ public class ClubManagerController : ControllerBase
         _dbContext.SaveChanges();
         return Ok(new { Success = true, Message = "Create request denied and deleted." });
     }
+
+    // DELETE: api/ClubManager/userclub
+    [HttpDelete("userclub")]
+    [Authorize]
+    public IActionResult DeleteUserFromClub([FromQuery] Guid userID, [FromQuery] Guid clubID)
+    {
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        if (role != "Advisor" && role != "Admin")
+            return StatusCode(403, new { Success = false, Message = "Only advisors and admins can remove users from clubs." });
+
+        var userClub = _dbContext.userclub.FirstOrDefault(uc => uc.userID == userID && uc.clubID == clubID);
+        if (userClub == null)
+            return NotFound(new { Success = false, Message = "User is not a member of the specified club." });
+
+        _dbContext.userclub.Remove(userClub);
+        _dbContext.SaveChanges();
+        return Ok(new { Success = true, Message = "User removed from club." });
+    }
 }
