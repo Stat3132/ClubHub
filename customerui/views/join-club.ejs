@@ -9,7 +9,13 @@
   <div class="form-container">
     <h1>Request to Join a Club</h1>
     <form method="POST" action="/join-club">
-      <label>Club ID: <input type="text" name="clubID" required></label><br>
+      <label>Select Club:
+  <select name="clubName" required>
+    <% clubs.forEach(club => { %>
+      <option value="<%= club.clubName %>"><%= club.clubName %></option>
+    <% }); %>
+  </select>
+</label><br>
       <label>Your Name: <input type="text" name="studentName" required></label><br>
       <label>Your Email: <input type="email" name="studentEmail" required></label><br>
       <label>Reason to Join: <textarea name="reasonToJoin" required></textarea></label><br>
