@@ -7,10 +7,12 @@
 <body>
   <h1>Add Event</h1>
   <form method="POST" action="/addEvent">
-    <label>Club ID: <input type="text" name="clubID" required></label><br>
-    <label>Event Title: <input type="text" name="eventTitle" required></label><br>
+    <label>Event Name: <input type="text" name="EventName" required></label><br>
     <label>Description:</label><br>
     <textarea name="eventDescription" rows="4" required></textarea><br>
+    <label>Budget: <input type="number" step="0.01" name="eventBudget" required></label><br>
+    <label>Coordinator Name: <input type="text" name="eventCoordinator" required></label><br>
+    <label>Coordinator's Number: <input type="text" name="eventCoordinatorsNumber" required></label><br>
     <button type="submit">Add Event</button>
   </form>
 </body>

@@ -20,8 +20,8 @@ Incomplete Microservices
 
 NEEDED FOR UI:
 - Remove USER - Tommy (Done)
-- Create events - 
-- Show events - 
+- Create events - Tommy (Done)
+- Show events - Tommy(Done)
 - ACCEPT/DENY Club join requests - 
 - Remove USER from CLUB - 
 

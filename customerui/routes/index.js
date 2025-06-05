@@ -267,8 +267,46 @@ router.post('/removeMember', authorizeRoles(['admin', 'advisor']), async (req, r
 });
 
 router.post('/addEvent', authorizeRoles(['admin', 'advisor']), async (req, res) => {
-  // Add event to club logic here
-  res.send('Event added (mock response).');
+  // Parse form data from req.body
+  const {
+    EventName,
+    eventDescription,
+    eventBudget,
+    eventCoordinator,
+    eventCoordinatorsNumber
+  } = req.body;
+
+  const token = req.cookies.token;
+
+  // Build the request body for the backend
+  const eventBody = {
+    EventName,
+    eventDescription,
+    eventBudget,
+    eventCoordinator,
+    eventCoordinatorsNumber
+  };
+
+  try {
+    const response = await axios.post(
+      'http://PRO290OcelotAPIGateway:8080/eventserviceapi/createevent',
+      eventBody,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (response.data?.id) {
+      res.send('Event added successfully.');
+    } else {
+      res.status(400).send(response.data?.message || 'Failed to add event.');
+    }
+  } catch (err) {
+    console.error('Error adding event:', err.message);
+    res.status(500).send('Failed to add event.');
+  }
 });
 
 router.post('/remove-user', authorizeRoles(['admin', 'advisor']), async (req, res) => {
@@ -446,7 +484,7 @@ router.post('/contact', async (req, res) => {
 
 router.get('/events', async (req, res) => {
   try {
-    const response = await axios.get('http://PRO290EventServiceAPI:8000/getevent');
+    const response = await axios.get('http://PRO290OcelotAPIGateway:8080/eventserviceapi/api/events');
     res.render('event', { events: response.data.events || [] });
   } catch (err) {
     console.error('Error fetching events:', err.message);

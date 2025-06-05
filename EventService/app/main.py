@@ -54,7 +54,7 @@ def serialize_event(event) -> dict:
 async def register_to_eureka():
     await eureka_client.init_async(
         eureka_server=os.getenv(
-            "EUREKA_URL", "http://PRO290EurekaRegistry:8761/eureka"
+            "EUREKA_URL", "http://PRO290EurekaRegistry:8761"
         ),
         app_name="PRO290EventServiceAPI",
         instance_port=8000,
